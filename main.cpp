@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cmath>
+#include <algorithm>
+
 using namespace std;
 
 void printMatrix(const vector<vector<float> >& matrix) {
