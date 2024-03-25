@@ -17,9 +17,11 @@ using namespace std;
 //         cout << endl;
 //     }
 // }
+
+
 __global__ void conv(const float* input, const float* kernel, float* output, int isize, int ksize) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x; // Column index
-    int j = blockIdx.y * blockDim.y + threadIdx.y; // Row index
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
     int res = isize - ksize + 1;
 
     if (i < res && j < res) {
@@ -34,6 +36,7 @@ __global__ void conv(const float* input, const float* kernel, float* output, int
         output[j * res + i] = sum;
     }
 }
+
 
 
 // vector<vector<float> > convpad(vector<vector<float> > input, vector<vector<float> > kernel){
@@ -69,17 +72,17 @@ __global__ void conv(const float* input, const float* kernel, float* output, int
 //     return outputMatrix;
 // }
 
-__global__ void relu(float* input, float* output, int dataSize) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < dataSize) {
-        output[idx] = max(0.0f, input[idx]);
+__global__ void relu(float* input, float* output, int n) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) {
+        output[i] = max(0.0f, input[i]);
     }
 }
 
-__global__ void tanh(float* input, int dataSize) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < dataSize) {
-        input[idx] = tanhf(input[idx]); // Note: Use tanhf for float
+__global__ void tanh(float* input, int n) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i< n) {
+        input[i] = tanhf(input[i]); 
     }
 }
 
@@ -130,7 +133,7 @@ vector<float> sigfunc(const vector<float>& input){
 vector<vector<float> > fileread(ifstream& file) {
     int rows, cols;
     file >> rows >> cols; 
-    vector<vector<float> > matrix(rows, vector<float>(cols));
+    
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             file >> matrix[i][j];
@@ -146,26 +149,39 @@ int main() {
         return -1;
     }
     
-    vector<vector<float> > input = fileread(file);
+    
     vector<vector<float> > kernel = fileread(file);
     int isize = input.size();
     int ksize = kernel.size();
+    int res = isize-ksize+1;
+    vector<float> flatinput(isize*isize);
+    vector<float> flatkernel(ksize*ksize);
     
-    vector<vector<float> > outputMatrix(res, vector<float>(res, 0));
-    int res = isize - ksize +1;
-    size_t inputSize = isize * isize * sizeof(float);
+    for(int i=0; i<isize; i++){
+        for (int j=0; j<isize; j++){
+            flatinput[isize*i+j] = input[i][j];
+        }
+    }
+
+    for(int i=0; i<ksize; i++){
+        for (int j=0; j<ksize; j++){
+            flatkernel[ksize*i+j] = kernel[i][j];
+        }
+    }
+
+    size_t inputsize = isize * isize * sizeof(float);
     size_t kernelsize = ksize*ksize*sizeof(float);
     size_t outputsize = res*res*sizeof(float);
 
     
     float *c_input, *c_kernel, *c_output;
-    cudaMalloc(&c_input, inputSize);
+    cudaMalloc(&c_input, inputsize);
     cudaMalloc(&c_kernel, kernelsize);
     cudaMalloc(&c_output, outputsize);
 
 
-    cudaMemcpy(c_input, input, inputsize, cudaMemcpyHostToDevice);
-    cudaMemcpy(c_kernel, kernel, kernelsize, cudaMemcpyHostToDevice);
+    cudaMemcpy(c_input, flatinput.data(), inputsize, cudaMemcpyHostToDevice);
+    cudaMemcpy(c_kernel, flatkernel.data(), kernelsize, cudaMemcpyHostToDevice);
 
     dim3 threads(16, 16);
     dim3 blocks((res + threads.x - 1) / threads.x, 
