@@ -1,15 +1,18 @@
 import cv2
 import numpy as np
 
-np.set_printoptions(linewidth=np.inf,formatter={'float': '{: 0.6f}'.format})
+# Set NumPy print options
+np.set_printoptions(linewidth=np.inf, formatter={'float': '{: 0.6f}'.format})
 
-img = cv2.imread('2.png',0)
-if img.shape != [28,28]:
-    img2 = cv2.resize(img,(28,28))
-    
-img = img2.reshape(28,28,-1);
+# Read the image in grayscale
+img = cv2.imread('2.png', 0)
 
-#revert the image,and normalize it to 0-1 range
-img = 1.0 - img/255.0
+# Resize the image to 28x28 if it's not already that size
+if img.shape != (28, 28):
+    img = cv2.resize(img, (28, 28))
 
-print(np.matrix(img))
+# Normalize and invert the image
+img = 1.0 - img / 255.0
+
+# Save the preprocessed image to a binary file
+img.tofile('input.bin')

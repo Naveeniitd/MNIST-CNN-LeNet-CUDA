@@ -39,38 +39,38 @@ __global__ void conv(const float* input, const float* kernel, float* output, int
 
 
 
-// vector<vector<float> > convpad(vector<vector<float> > input, vector<vector<float> > kernel){
-//     int isize = input.size();
-//     int ksize = kernel.size();
-//     int pad = (ksize-1)/2;
-//     int padinput = isize + pad*2;
-//     int res = isize;
+vector<vector<float> > convpad(vector<vector<float> > input, vector<vector<float> > kernel){
+    int isize = input.size();
+    int ksize = kernel.size();
+    int pad = (ksize-1)/2;
+    int padinput = isize + pad*2;
+    int res = isize;
 
-//     vector<vector<float> > padMatrix(padinput, vector<float>(padinput, 0));
+    vector<vector<float> > padMatrix(padinput, vector<float>(padinput, 0));
 
-//     vector<vector<float> > outputMatrix(res, vector<float>(res, 0));
+    vector<vector<float> > outputMatrix(res, vector<float>(res, 0));
 
-//     for (int i = 0; i < isize; ++i) {
-//         for (int j = 0; j < isize; ++j) {
-//             padMatrix[i + pad][j + pad] = input[i][j];
-//         }
-//     }
-//     printMatrix(padMatrix);
+    for (int i = 0; i < isize; ++i) {
+        for (int j = 0; j < isize; ++j) {
+            padMatrix[i + pad][j + pad] = input[i][j];
+        }
+    }
+    //printMatrix(padMatrix);
 
-//     for (int i = 0; i < res; ++i) {
-//         for (int j = 0; j < res; ++j) {
-//             float sum = 0;
-//             for (int m = 0; m < ksize; ++m) {
-//                 for (int n = 0; n < ksize; ++n) {
-//                     sum += padMatrix[i + m][j + n] * kernel[m][n];
-//                 }
-//             }
-//             outputMatrix[i][j] = sum;
-//         }
-//     }
+    for (int i = 0; i < res; ++i) {
+        for (int j = 0; j < res; ++j) {
+            float sum = 0;
+            for (int m = 0; m < ksize; ++m) {
+                for (int n = 0; n < ksize; ++n) {
+                    sum += padMatrix[i + m][j + n] * kernel[m][n];
+                }
+            }
+            outputMatrix[i][j] = sum;
+        }
+    }
 
-//     return outputMatrix;
-// }
+    return outputMatrix;
+}
 
 __global__ void relu(float* input, float* output, int n) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -143,19 +143,17 @@ vector<vector<float> > fileread(ifstream& file) {
 }
 
 int main() {
-    ifstream file("matrix.txt");
-    if (!file.is_open()) {
-        std::cerr << "Error opening file" << std::endl;
-        return -1;
-    }
-    
-    
-    vector<vector<float> > kernel = fileread(file);
+
+
+    float* input = new float[28 * 28];
+    ifstream file("input.bin", ios::binary);
+    file.read(reinterpret_cast<char*>(input), 28*28*sizeof(float));
+    file.close();
+
     int isize = input.size();
     int ksize = kernel.size();
     int res = isize-ksize+1;
-    vector<float> flatinput(isize*isize);
-    vector<float> flatkernel(ksize*ksize);
+    
     
     for(int i=0; i<isize; i++){
         for (int j=0; j<isize; j++){
