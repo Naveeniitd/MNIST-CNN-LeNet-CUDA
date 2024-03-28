@@ -8,6 +8,12 @@
 #include <algorithm>
 #include <cuda_runtime.h>
 using namespace std;
+struct Weights {
+    vector<float> conv1;
+    vector<float> conv2;
+    vector<float> fc1;
+    vector<float> fc2;
+};
 
 // void printMatrix(const vector<vector<float> >& matrix) {
 //     for (const auto& row : matrix) {
@@ -17,13 +23,7 @@ using namespace std;
 //         cout << endl;
 //     }
 // }
-struct Weights {
-    vector<float> conv1;
-    vector<float> conv2;
-    vector<float> fc1;
-    vector<float> fc2;
-};
-
+//------------------DEVICE CODE-------------------------------//
 __global__ void conv(const float* input, const float* kernel, float* output, int isize, int ksize) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -109,7 +109,7 @@ __global__ void tanh(float* input, int n) {
 //     }
 // }
 
-
+//---------HOST CODE-------------------------//
 float sigmoid(float x){
     return 1.0f/(1.0f+exp(-x));
 }
@@ -121,20 +121,20 @@ vector<float> sigfunc(const vector<float>& input){
 }
 
 
-// vector<float> softmax(const vector<float>& input) {
-//     vector<float> outputMatrix(input.size());
-//     float p = *max_element(input.begin(), input.end());
-//     float sum = 0.0f;
-//     for (int i = 0; i < input.size(); ++i) {
-//         outputMatrix[i] = exp(input[i] - p); 
-//         sum += outputMatrix[i];
-//     }
-//     for (float& value : outputMatrix) {
-//         value /= sum;
-//     }
+vector<float> softmax(const vector<float>& input) {
+    vector<float> outputMatrix(input.size());
+    float p = *max_element(input.begin(), input.end());
+    float sum = 0.0f;
+    for (int i = 0; i < input.size(); ++i) {
+        outputMatrix[i] = exp(input[i] - p); 
+        sum += outputMatrix[i];
+    }
+    for (float& value : outputMatrix) {
+        value /= sum;
+    }
 
-//     return outputMatrix;
-// }
+    return outputMatrix;
+}
 // vector<vector<float> > fileread(ifstream& file) {
 //     int rows, cols;
 //     file >> rows >> cols; 
@@ -146,7 +146,8 @@ vector<float> sigfunc(const vector<float>& input){
 //     }
 //     return matrix;
 // }
-vector<float> WeightsRead( const string& path) {
+//--------------------------function to read trained weights---------------------------//
+vector<float> fileRead( const string& path) {
     vector<float> weights;
     ifstream file(path.c_str());
     float weight;
@@ -163,22 +164,39 @@ vector<float> WeightsRead( const string& path) {
     file.close();
     return weights;
 }
-
-int main() {
-
-    Weights weights;
-    weights.conv1 = WeightsRead("trained_weights/conv1.txt");
-    weights.conv2 = WeightsRead("trained_weights/conv2.txt");
-    weights.fc1 = WeightsRead("trained_weights/fc1.txt");
-    weights.fc2 = WeightsRead("trained_weights/fc2.txt");
-    cout << weights.conv1.size()<<" ";
-    cout << weights.conv2.size()<<" ";
-    cout << weights.fc1.size()<< " ";
-    cout << weights.fc2.size()<< " ";
-    float* input = new float[28 * 28];
-    ifstream file("input.bin", ios::binary);
+//------------------function to load binary img in float* input-----------------------//
+bool imgload(const string& path, float* input){
+    ifstream file(path.c_str(), ios::binary);
     file.read(reinterpret_cast<char*>(input), 28*28*sizeof(float));
     file.close();
+    return true;
+}
+
+//----------------MAIN FUNCTION--------------------------//
+int main() {
+    //---------------Reading Trained Weights in Weights struct datatype ----------------------//
+    Weights weights;
+    weights.conv1 = fileRead("trained_weights/conv1.txt");
+    weights.conv2 = fileRead("trained_weights/conv2.txt");
+    weights.fc1 = fileRead("trained_weights/fc1.txt");
+    weights.fc2 = fileRead("trained_weights/fc2.txt");
+    // cout << weights.conv1.size()<<" ";
+    // cout << weights.conv2.size()<<" ";
+    // cout << weights.fc1.size()<< " ";
+    // cout << weights.fc2.size()<< " ";
+    //-----------------------Host to Device Copy of Trained Weights---------------------------------------//
+    float *d_conv1, *d_conv2, *d_fc1, *d_fc2; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
+    cudaMalloc(&d_conv1, weights.conv1.size() * sizeof(float));
+    cudaMemcpy(d_conv1, weights.conv1.data(), weights.conv1.size() * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_conv2, weights.conv2.size() * sizeof(float));
+    cudaMemcpy(d_conv2, weights.conv2.data(), weights.conv2.size() * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_fc1, weights.fc1.size() * sizeof(float));
+    cudaMemcpy(d_fc1, weights.fc1.data(), weights.fc1.size() * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_fc2, weights.fc2.size() * sizeof(float));
+    cudaMemcpy(d_fc2, weights.fc2.data(), weights.fc2.size() * sizeof(float), cudaMemcpyHostToDevice);
+
+    float* input = new float[28 * 28];
+    cout << imgload("Binary_img/000000-num7.bin", input);
 
     // int isize = input.size();
     // int ksize = kernel.size();
@@ -202,13 +220,12 @@ int main() {
     // size_t outputsize = res*res*sizeof(float);
 
     
-    // float *c_input, *c_kernel, *c_output;
-    // cudaMalloc(&c_input, inputsize);
-    // cudaMalloc(&c_kernel, kernelsize);
-    // cudaMalloc(&c_output, outputsize);
+    float *c_input, *c_output;
+    cudaMalloc(&c_input, 10000*28*28*sizeof(float));
+    cudaMalloc(&c_output, 10000*28*28*sizeof(float));
 
 
-    // cudaMemcpy(c_input, flatinput.data(), inputsize, cudaMemcpyHostToDevice);
+    //cudaMemcpy(c_input, input.data(), 10000*28*28*sizeof(float), cudaMemcpyHostToDevice);
     // cudaMemcpy(c_kernel, flatkernel.data(), kernelsize, cudaMemcpyHostToDevice);
 
     // dim3 threads(16, 16);
