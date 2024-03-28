@@ -17,7 +17,12 @@ using namespace std;
 //         cout << endl;
 //     }
 // }
-
+struct Weights {
+    vector<float> conv1;
+    vector<float> conv2;
+    vector<float> fc1;
+    vector<float> fc2;
+};
 
 __global__ void conv(const float* input, const float* kernel, float* output, int isize, int ksize) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -130,69 +135,94 @@ vector<float> sigfunc(const vector<float>& input){
 
 //     return outputMatrix;
 // }
-vector<vector<float> > fileread(ifstream& file) {
-    int rows, cols;
-    file >> rows >> cols; 
+// vector<vector<float> > fileread(ifstream& file) {
+//     int rows, cols;
+//     file >> rows >> cols; 
     
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            file >> matrix[i][j];
-        }
+//     for (int i = 0; i < rows; ++i) {
+//         for (int j = 0; j < cols; ++j) {
+//             file >> matrix[i][j];
+//         }
+//     }
+//     return matrix;
+// }
+vector<float> WeightsRead( const string& path) {
+    vector<float> weights;
+    ifstream file(path.c_str());
+    float weight;
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << path << std::endl;
+        return weights;
     }
-    return matrix;
+
+    while (file >> weight) {
+        weights.push_back(weight);
+    }
+
+    file.close();
+    return weights;
 }
 
 int main() {
 
-
+    Weights weights;
+    weights.conv1 = WeightsRead("trained_weights/conv1.txt");
+    weights.conv2 = WeightsRead("trained_weights/conv2.txt");
+    weights.fc1 = WeightsRead("trained_weights/fc1.txt");
+    weights.fc2 = WeightsRead("trained_weights/fc2.txt");
+    cout << weights.conv1.size()<<" ";
+    cout << weights.conv2.size()<<" ";
+    cout << weights.fc1.size()<< " ";
+    cout << weights.fc2.size()<< " ";
     float* input = new float[28 * 28];
     ifstream file("input.bin", ios::binary);
     file.read(reinterpret_cast<char*>(input), 28*28*sizeof(float));
     file.close();
 
-    int isize = input.size();
-    int ksize = kernel.size();
-    int res = isize-ksize+1;
+    // int isize = input.size();
+    // int ksize = kernel.size();
+    // int res = isize-ksize+1;
     
     
-    for(int i=0; i<isize; i++){
-        for (int j=0; j<isize; j++){
-            flatinput[isize*i+j] = input[i][j];
-        }
-    }
+    // for(int i=0; i<isize; i++){
+    //     for (int j=0; j<isize; j++){
+    //         flatinput[isize*i+j] = input[i][j];
+    //     }
+    // }
 
-    for(int i=0; i<ksize; i++){
-        for (int j=0; j<ksize; j++){
-            flatkernel[ksize*i+j] = kernel[i][j];
-        }
-    }
+    // for(int i=0; i<ksize; i++){
+    //     for (int j=0; j<ksize; j++){
+    //         flatkernel[ksize*i+j] = kernel[i][j];
+    //     }
+    // }
 
-    size_t inputsize = isize * isize * sizeof(float);
-    size_t kernelsize = ksize*ksize*sizeof(float);
-    size_t outputsize = res*res*sizeof(float);
+    // size_t inputsize = isize * isize * sizeof(float);
+    // size_t kernelsize = ksize*ksize*sizeof(float);
+    // size_t outputsize = res*res*sizeof(float);
 
     
-    float *c_input, *c_kernel, *c_output;
-    cudaMalloc(&c_input, inputsize);
-    cudaMalloc(&c_kernel, kernelsize);
-    cudaMalloc(&c_output, outputsize);
+    // float *c_input, *c_kernel, *c_output;
+    // cudaMalloc(&c_input, inputsize);
+    // cudaMalloc(&c_kernel, kernelsize);
+    // cudaMalloc(&c_output, outputsize);
 
 
-    cudaMemcpy(c_input, flatinput.data(), inputsize, cudaMemcpyHostToDevice);
-    cudaMemcpy(c_kernel, flatkernel.data(), kernelsize, cudaMemcpyHostToDevice);
+    // cudaMemcpy(c_input, flatinput.data(), inputsize, cudaMemcpyHostToDevice);
+    // cudaMemcpy(c_kernel, flatkernel.data(), kernelsize, cudaMemcpyHostToDevice);
 
-    dim3 threads(16, 16);
-    dim3 blocks((res + threads.x - 1) / threads.x, 
-                   (res + threads.y - 1) / threads.y);
+    // dim3 threads(16, 16);
+    // dim3 blocks((res + threads.x - 1) / threads.x, 
+    //                (res + threads.y - 1) / threads.y);
 
-    conv<<<blocks, threads>>>(c_input, c_kernel, c_output, isize, ksize);
+    // conv<<<blocks, threads>>>(c_input, c_kernel, c_output, isize, ksize);
 
-    cudaMemcpy(outputMatrix, c_output, outputsize, cudaMemcpyDeviceToHost);
-    cudaFree(c_input);
-    cudaFree(c_kernel);
-    cudaFree(c_output);
+    // cudaMemcpy(outputMatrix, c_output, outputsize, cudaMemcpyDeviceToHost);
+    // cudaFree(c_input);
+    // cudaFree(c_kernel);
+    // cudaFree(c_output);
 
-    printMatrix(outputMatrix);
+    // printMatrix(outputMatrix);
 
     return 0;
 }
