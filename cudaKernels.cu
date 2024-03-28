@@ -23,58 +23,56 @@ struct Weights {
 //         cout << endl;
 //     }
 // }
-//------------------DEVICE CODE-------------------------------//
-__global__ void conv(const float* input, const float* kernel, float* output, int isize, int ksize) {
+//------------------DEVICE KERNEL CODE-------------------------------//
+
+
+//--------------convulation without padding---------------------------//
+__global__ void conv(const float* input, const float* weights, float* output, int isize, int ksize, int out_channel ) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int k = blockIdx.z * blockDim.z + threadIdx.z;
     int res = isize - ksize + 1;
 
-    if (i < res && j < res) {
+    if (i < res && j < res && k < out_channel) {
         float sum = 0.0f;
         for (int m = 0; m < ksize; ++m) {
             for (int n = 0; n < ksize; ++n) {
                 int X = i + m;
                 int Y = j + n;
-                sum += input[Y * isize + X] * kernel[m * ksize + n];
+                sum += input[Y * isize + X] * weights[ k*(ksize*ksize) + ( m * ksize + n)];
             }
         }
-        output[j * res + i] = sum;
+        sum+= weights[out_channel*ksize*ksize +k];
+        output[k*(res*res) + j * res + i] = sum;
     }
 }
 
 
 
-vector<vector<float> > convpad(vector<vector<float> > input, vector<vector<float> > kernel){
-    int isize = input.size();
-    int ksize = kernel.size();
-    int pad = (ksize-1)/2;
-    int padinput = isize + pad*2;
+__global__ void convpad(const float* input, const float* weights, float* output, int isize, int ksize, int out_channel, int pad){
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    int k = blockIdx.z * blockDim.z + threadIdx.z;
     int res = isize;
 
-    vector<vector<float> > padMatrix(padinput, vector<float>(padinput, 0));
+    if (i < isize && j < isize && k < out_channel) {
+        float sum = 0.0f;
+        for (int m = 0; m < ksize; ++m) {
+            for (int n = 0; n < ksize; ++n) {
+                int x_index = i + m - pad;
+                int y_index = j + n - pad;
 
-    vector<vector<float> > outputMatrix(res, vector<float>(res, 0));
-
-    for (int i = 0; i < isize; ++i) {
-        for (int j = 0; j < isize; ++j) {
-            padMatrix[i + pad][j + pad] = input[i][j];
-        }
-    }
-    //printMatrix(padMatrix);
-
-    for (int i = 0; i < res; ++i) {
-        for (int j = 0; j < res; ++j) {
-            float sum = 0;
-            for (int m = 0; m < ksize; ++m) {
-                for (int n = 0; n < ksize; ++n) {
-                    sum += padMatrix[i + m][j + n] * kernel[m][n];
-                }
+                // Check boundaries for padding
+                if (x_index >= 0 && x_index < isize && y_index >= 0 && y_index < isize) {
+                    sum += input[y_index * isize + x_index] * weights[k * (ksize * ksize) + (m * ksize + n)];
+                } // Implicit else: sum += 0 for padding areas
             }
-            outputMatrix[i][j] = sum;
         }
-    }
+        // Add the bias term
+        sum += weights[out_channel * ksize * ksize + k];
 
-    return outputMatrix;
+        output[k * (res * res) + j * res + i] = sum;
+    }
 }
 
 __global__ void relu(float* input, float* output, int n) {
@@ -91,23 +89,28 @@ __global__ void tanh(float* input, int n) {
     }
 }
 
+//-----------------------------Max Pooling--------------------------------------------//
+__global__ void maxPool(const float* input, float* output, int isize, int output_channel, int poolSize, int stride) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    int z = blockIdx.z * blockDim.z + threadIdx.z;
 
-// __global__ void maxPool(const float* input, float* output, int isize, int poolSize, int outputSize) {
-//     int ox = blockIdx.x * blockDim.x + threadIdx.x; // Output x-coordinate
-//     int oy = blockIdx.y * blockDim.y + threadIdx.y; // Output y-coordinate
+    if (x < isize && y < isize && z < out_channel) {
+        float maxVal = -FLT_MAX;
+        for (int i = 0; i < poolSize; ++i) {
+            for (int j = 0; j < poolSize; ++j) {
+                int X = x * stride + j;
+                int Y = y * stride + i;
+                if (X < isize && Y < isize) {
+                    int index = z * isize * isize + Y * isize + X;
+                    maxVal = fmaxf(maxVal, input[index]);
+                }
+            }
+        }
+        output[z * (isize / stride) * (isize / stride) + (y / stride) * (isize / stride) + (x / stride)] = maxVal;
+    }
+}
 
-//     if (ox < outputSize && oy < outputSize) {
-//         float maxVal = -FLT_MAX;
-//         for (int i = 0; i < poolSize; ++i) {
-//             for (int j = 0; j < poolSize; ++j) {
-//                 int ix = ox * poolSize + i;
-//                 int iy = oy * poolSize + j;
-//                 maxVal = max(maxVal, input[iy * isize + ix]);
-//             }
-//         }
-//         output[oy * outputSize + ox] = maxVal;
-//     }
-// }
 
 //---------HOST CODE-------------------------//
 float sigmoid(float x){
@@ -135,18 +138,9 @@ vector<float> softmax(const vector<float>& input) {
 
     return outputMatrix;
 }
-// vector<vector<float> > fileread(ifstream& file) {
-//     int rows, cols;
-//     file >> rows >> cols; 
-    
-//     for (int i = 0; i < rows; ++i) {
-//         for (int j = 0; j < cols; ++j) {
-//             file >> matrix[i][j];
-//         }
-//     }
-//     return matrix;
-// }
-//--------------------------function to read trained weights---------------------------//
+
+
+//--------------------------Function to read trained weights---------------------------//
 vector<float> fileRead( const string& path) {
     vector<float> weights;
     ifstream file(path.c_str());
@@ -164,7 +158,7 @@ vector<float> fileRead( const string& path) {
     file.close();
     return weights;
 }
-//------------------function to load binary img in float* input-----------------------//
+//------------------Function to load binary img in float* input-----------------------//
 bool imgload(const string& path, float* input){
     ifstream file(path.c_str(), ios::binary);
     file.read(reinterpret_cast<char*>(input), 28*28*sizeof(float));
@@ -172,7 +166,7 @@ bool imgload(const string& path, float* input){
     return true;
 }
 
-//----------------MAIN FUNCTION--------------------------//
+//------------------------------------MAIN FUNCTION-----------------------------------------//
 int main() {
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
@@ -184,7 +178,9 @@ int main() {
     // cout << weights.conv2.size()<<" ";
     // cout << weights.fc1.size()<< " ";
     // cout << weights.fc2.size()<< " ";
+    
     //-----------------------Host to Device Copy of Trained Weights---------------------------------------//
+
     float *d_conv1, *d_conv2, *d_fc1, *d_fc2; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     cudaMalloc(&d_conv1, weights.conv1.size() * sizeof(float));
     cudaMemcpy(d_conv1, weights.conv1.data(), weights.conv1.size() * sizeof(float), cudaMemcpyHostToDevice);
@@ -194,10 +190,56 @@ int main() {
     cudaMemcpy(d_fc1, weights.fc1.data(), weights.fc1.size() * sizeof(float), cudaMemcpyHostToDevice);
     cudaMalloc(&d_fc2, weights.fc2.size() * sizeof(float));
     cudaMemcpy(d_fc2, weights.fc2.data(), weights.fc2.size() * sizeof(float), cudaMemcpyHostToDevice);
-
+    //------------------imgload from Binary_img folder---------------------------------------------------//
     float* input = new float[28 * 28];
     cout << imgload("Binary_img/000000-num7.bin", input);
 
+    //-------------------Host to device copy of input/output---------------------------------------------------//
+    float *c_input, *c_output;
+    cudaMalloc(&c_input, 28*28*sizeof(float));
+    cudaMalloc(&c_output, 28*28*sizeof(float));
+    cudaMemcpy(c_input, input, 28*28*sizeof(float), cudaMemcpyHostToDevice);
+
+
+    //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
+
+
+    //----------------------------Conv_1 28,24,1,20,5,1,0,0,500,20,520-----------------------------//
+
+    dim3 blockSize(16, 16, 1); // Block size of 16x16 for spatial dimensions and 1 for channels
+    dim3 gridSize((24 + blockSize.x - 1) / blockSize.x, (24 + blockSize.y - 1) / blockSize.y, 20);
+
+    conv<<<gridSize, blockSize>>>(c_input, d_conv1, c_output, 28, 5, 20);
+
+
+    //----------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,- -----------------------------------//
+    dim3 blockSize(16, 16, 1);
+    dim3 gridSize((12 + blockSize.x - 1) / blockSize.x, (12 + blockSize.y - 1) / blockSize.y, 20);
+
+    maxPool<<<gridSize, blockSize>>>(c_output, d_output, 24, 20, 2, 2);
+
+    //----------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050-------------------------------------------//
+
+    //----------------------------Pool_2,8,4,50,50,2,2,0,0,-,-,- ----------------------------------------------//
+    dim3 blockSize(8, 8, 1);
+    dim3 gridSize(1,1, 50);
+
+    maxPool<<<gridSize, blockSize>>>(c_output, d_output, 24, 50, 2, 2);
+
+    //------------------------------FC_1,4,1,50,500,4,1,0,1,400000,500,400500---------------------------------------//
+
+
+    float* h_output = new float[24*24];
+    cudaMemcpy(h_output, c_output, 24*24 * sizeof(float), cudaMemcpyDeviceToHost);
+    
+    for (int y = 0; y < 24; ++y) {
+        for (int x = 0; x < 24; ++x) {
+            std::cout << h_output[y * 24 + x] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    cudaDeviceSynchronize();
     // int isize = input.size();
     // int ksize = kernel.size();
     // int res = isize-ksize+1;
@@ -220,13 +262,10 @@ int main() {
     // size_t outputsize = res*res*sizeof(float);
 
     
-    float *c_input, *c_output;
-    cudaMalloc(&c_input, 10000*28*28*sizeof(float));
-    cudaMalloc(&c_output, 10000*28*28*sizeof(float));
+    
 
 
-    //cudaMemcpy(c_input, input.data(), 10000*28*28*sizeof(float), cudaMemcpyHostToDevice);
-    // cudaMemcpy(c_kernel, flatkernel.data(), kernelsize, cudaMemcpyHostToDevice);
+    
 
     // dim3 threads(16, 16);
     // dim3 blocks((res + threads.x - 1) / threads.x, 
@@ -235,9 +274,10 @@ int main() {
     // conv<<<blocks, threads>>>(c_input, c_kernel, c_output, isize, ksize);
 
     // cudaMemcpy(outputMatrix, c_output, outputsize, cudaMemcpyDeviceToHost);
-    // cudaFree(c_input);
-    // cudaFree(c_kernel);
-    // cudaFree(c_output);
+    cudaFree(c_input);
+    cudaFree(c_output);
+
+    delete[] h_output;
 
     // printMatrix(outputMatrix);
 
