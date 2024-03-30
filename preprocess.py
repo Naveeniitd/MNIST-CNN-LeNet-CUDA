@@ -1,34 +1,18 @@
 import cv2
 import numpy as np
-import glob
-import os
 
-def preprocess_image(image_path):
-    # Read the image in grayscale
-    img = cv2.imread(image_path, 0)
+# Load and preprocess the image
+img_path = '2.png'
+img = cv2.imread(img_path, 0)
+if img.shape != (28, 28):
+    img = cv2.resize(img, (28, 28))
 
-    # Resize the image to 28x28 if it's not already that size
-    if img.shape != (28, 28):
-        img = cv2.resize(img, (28, 28))
+# Revert the image and normalize it to the 0-1 range
+img = 1.0 - img / 255.0
 
-    # Normalize and invert the image
-    img2 = 1.0 - img / 255.0
+# Flatten the image to create a 1D array and ensure it's in float32 for CUDA
+img_flattened = img.flatten().astype(np.float32)
 
-    return img2
-
-def save(img, output_path):
-    # Save the preprocessed image to a binary file
-    img.tofile(output_path)
-
-
-pattern = "test/*.png"
-out_dir = "Binary_img"
-if not os.path.exists(out_dir):
-    os.makedirs(out_dir)
-
-
-for image_path in glob.glob(pattern):
-    img2 = preprocess_image(image_path)
-    base_name = image_path.split('/')[-1].split('.')[0]
-    output_path = os.path.join(out_dir, f"{base_name}.bin")
-    save(img2, output_path)
+# Save the flattened image to a binary file
+binary_path = '2.bin'
+img_flattened.tofile(binary_path)
