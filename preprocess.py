@@ -1,21 +1,42 @@
 import cv2
 import numpy as np
+import os
 
-np.set_printoptions(linewidth=np.inf,formatter={'float': '{: 0.6f}'.format})
+# Set input and output directory paths
+input_dir = 'test'
+output_dir = 'binary_test'
 
-img = cv2.imread('000008-num5.png',0)
-if img.shape != [28,28]:
-    img2 = cv2.resize(img,(28,28))
-    
-img = img2.reshape(28,28,-1);
-# Ensure img is of type float32
-img = img.astype(np.float32)
+# Ensure output directory exists
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-#revert the image,and normalize it to 0-1 range
-img =img/255.0
+np.set_printoptions(linewidth=np.inf, formatter={'float': '{: 0.6f}'.format})
 
-img.tofile("000008-num5.bin")
+# List all files in the input directory
+for file_name in os.listdir(input_dir):
+    # Check if the file is an image (e.g., '.png', '.jpg')
+    if file_name.lower().endswith(('.png')):
+        # Construct the full file path
+        file_path = os.path.join(input_dir, file_name)
+        
+        # Read the image in grayscale
+        img = cv2.imread(file_path, 0)
+        
+        # Resize the image if it's not already 28x28
+        if img.shape != [28, 28]:
+            img = cv2.resize(img, (28, 28))
+        
+        # Reshape the image
+        img = img.reshape(28, 28, -1)
+        # Convert image to float32
+        img = img.astype(np.float32)
+        # Normalize the image to 0-1 range
+        img = img / 255.0
+        
+        # Construct the output file path
+        output_file_path = os.path.join(output_dir, os.path.splitext(file_name)[0] + '.bin')
+        
+        # Save the processed image to a .bin file
+        img.tofile(output_file_path)
 
-# with open('7.bin', 'rb') as file:
-#     data = np.fromfile(file, dtype=np.float32)  # Ensure dtype matches what you wrote
-#     print(data[:500]) 
+        print(f"Processed and saved: {output_file_path}")

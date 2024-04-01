@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <utility>
 #include <queue>
+#include <dirent.h>
 using namespace std;
 
 struct Weights {
@@ -80,9 +81,6 @@ __global__ void conv_cuda(const float* input, const float* weights, float* outpu
         output[o * res * res + y * res + x] = sum + weights[out_channel * in_channel * ksize * ksize + o];
     }
 }
-
-//
-
 // __global__ void relu(float* input, float* output, int n) {
 //     int i = blockIdx.x * blockDim.x + threadIdx.x;
 //     if (i < n) {
@@ -96,7 +94,7 @@ __global__ void conv_cuda(const float* input, const float* weights, float* outpu
 //         input[i] = tanhf(input[i]); 
 //     }
 // }
-
+//------------------------------------------------KernelMaxPooling-----------------------------------------------------------------------------//
 __global__ void MaxPooling(const float* input, float* output, int in_channel, int isize, int ksize, int stride) {
     int res = (isize - ksize) / stride + 1;
     
@@ -122,8 +120,42 @@ __global__ void MaxPooling(const float* input, float* output, int in_channel, in
         currentOutput[y * res + x] = maxVal;
     }
 }
+//----------------------------------------fully connnected with relu-------------------------------------------------------------//
+__global__ void fconv_cudaR(const float* input, const float* weights, float* output, int in_channel, int out_channel, int isize) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x; // Unique thread index
+    int inputSize = isize * isize * in_channel; // Total size of the input for one filter
 
+    if (index < out_channel) { // Check if thread index is within the range of output channels
+        const float* currentWeights = weights + index * inputSize; // Adjust index for multi-channel
+        float bias = weights[out_channel * inputSize + index]; // Bias index adjusted for flattened input
+        float sum = 0.0f;
 
+        for (int j = 0; j < inputSize; ++j) {
+            sum += input[j] * currentWeights[j];
+        }
+
+        // Apply bias and ReLU activation
+        output[index] = max(0.0f, sum + bias); // Using max for ReLU
+    }
+}
+//----------------------------------------fully connected without relu--------------------------------------------------//
+__global__ void fconv_cuda(const float* input, const float* weights, float* output, int in_channel, int out_channel, int isize) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x; // Unique thread index
+    int inputSize = isize * isize * in_channel; // Total size of the input for one filter
+
+    if (index < out_channel) { // Check if thread index is within the range of output channels
+        const float* currentWeights = weights + index * inputSize; // Adjust index for multi-channel
+        float bias = weights[out_channel * inputSize + index]; // Bias index adjusted for flattened input
+        float sum = 0.0f;
+
+        for (int j = 0; j < inputSize; ++j) {
+            sum += input[j] * currentWeights[j];
+        }
+
+        // Apply bias and ReLU activation
+        output[index] = sum + bias; // Using max for ReLU
+    }
+}
 //------------------------------------HOST-CODE-------------------------------------------------------------------//
 //-------------------------------Max Pooling-----------------------------------------------------------------------//
 void maxPooling(const float* input, float* output, int in_channel, int isize, int ksize, int stride) {
@@ -243,7 +275,7 @@ float* loadBatch(const char* filename, int& dataSize) {
 //----------------------------------------fully connected Convolution---------------------------------------------------//
 void fconv(const float* input, const float* weights, float* output, int in_channel, int out_channel, int isize) {
     // For FC_1, the output dimension is always 1 per filter
-    int res = 1; // Not used in the same way as in convolution
+    
     int inputSize = isize * isize * in_channel; // Total size of the input for one filter
     
     for (int i = 0; i < out_channel; ++i) {
@@ -257,8 +289,10 @@ void fconv(const float* input, const float* weights, float* output, int in_chann
         
         // Apply bias and ReLU activation
         output[i] = std::max(0.0f, sum + bias);
+
     }
 }
+
 //---------------------------------------------Find Top 5-----------------------------------------------------------//
 void findTop5(const float* softmax_probs, int num_classes, std::vector<int>& top_classes, std::vector<float>& top_probs) {
     // Using a min heap to store the top probabilities and their corresponding indices
@@ -322,6 +356,7 @@ bool imgload(const string& path, float* input){
 
 //------------------------------------MAIN FUNCTION-----------------------------------------//
 int main() {
+
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
     weights.conv1 = fileRead("trained_weights/conv1.txt", 520);
@@ -329,146 +364,202 @@ int main() {
     weights.fc1 = fileRead("trained_weights/fc1.txt", 400500);
     weights.fc2 = fileRead("trained_weights/fc2.txt", 5010);
     // printArray(weights.conv1, 520);
-    //-----------------Reading Image---------------------------------------------------//
-    float* input = new float[28 * 28];
-    std::ifstream file("2.bin", std::ios::binary);
-    if (!file) {
-        std::cerr << "Cannot open file!" << std::endl;
-        return 1;
-    }
-
-    // Read the entire image data into the array
-    file.read(reinterpret_cast<char*>(input), 28*28 * sizeof(float));
-    if (!file) {
-        std::cerr << "Error reading file or file too short!" << std::endl;
-        return 2;
-    }
-
-    file.close();
-    float*c1_input;
-    cudaMalloc(&c1_input, 28*28*1*sizeof(float));
-    cudaMemcpy(c1_input, input, 28*28*1 * sizeof(float), cudaMemcpyHostToDevice);
-    //-------------------------------Host_to_Device_Copy_of_Trained_Weights---------------------------------------//
-
-    float *d_conv1, *d_conv2, *d_fc1, *d_fc2; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
-    cudaMalloc(&d_conv1, 520 * sizeof(float));
-    cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMalloc(&d_conv2, 25050 * sizeof(float));
-    cudaMemcpy(d_conv2, weights.conv2, 25050 * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMalloc(&d_fc1, 400500 * sizeof(float));
-    cudaMemcpy(d_fc1, weights.fc1, 400500 * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMalloc(&d_fc2, 5010 * sizeof(float));
-    cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice);
     
+    std::string directory = "binary_test/";
+    DIR* dir;
+    struct dirent* ent;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
+    if ((dir = opendir(directory.c_str())) != nullptr) {
+        while ((ent = readdir(dir)) != nullptr) {
+            std::string filename = ent->d_name;
 
-    //-------------------Memory alloc in device for different output of layers---------------------------------------------------//
-    float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *relu_output;
-    
-    cudaMalloc(&c1_output, 24*24*20*sizeof(float));
-    cudaMalloc(&p1_output, 12*12*20*sizeof(float));
-    cudaMalloc(&c2_output, 8*8*50*sizeof(float));
-    cudaMalloc(&p2_output, 4*4*50*sizeof(float));
-    cudaMalloc(&f1_output, 500*sizeof(float));
-    cudaMalloc(&relu_output, 500*sizeof(float)); 
-    cudaMalloc(&f2_output, 10 * sizeof(float));
-    
-    //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
-    //const string directory = "Binary_img";
-    //for(int i = 0 ; i < 10000; i++){
-    // std::stringstream ss;
-    // ss << std::setw(6) << std::setfill('0') << i << "-numX.bin";
-    // std::string filepath = directory + ss.str();
-    // float* input = new float[28 * 28];
-    // imgload(filepath, input);       
-    // float* d_image;
-    // cudaMalloc(&d_image, 28*28 * sizeof(float));
-    // cudaMemcpy(d_image, input, 28*28 * sizeof(float), cudaMemcpyHostToDevice);
-    // printMatrix(outputMatrix);
-//---------------------------------------------------------------------------------------------------------------------//
-    
-    //printArray(input, 28*28);
-//--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
-    dim3 threadsPerBlock(16, 16, 1); // Example thread block size
-    dim3 numBlocks((24 + threadsPerBlock.x - 1) / threadsPerBlock.x,
-               (24 + threadsPerBlock.y - 1) / threadsPerBlock.y,
-               20);
+            // Check if the file is a .bin file
+            if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
+                std::string filepath = directory + filename;
+                float* input = new float[28 * 28];
+                std::ifstream file(filepath, std::ios::binary);
+                std::cout << "Trying to open: " << filepath << std::endl;
 
-    conv_cuda<<<numBlocks, threadsPerBlock>>>(c1_input, d_conv1, c1_output, 1, 20, 28, 5);
-    cudaDeviceSynchronize(); // Wait for the kernel to complete
+                if (!file) {
+                    std::cerr << "Cannot open file!" << std::endl;
+                    return 1;
+                }
 
-    // float* test_output = new float[24*24*20];
-    // cudaMemcpy(test_output, c1_output, 24*24*20 * sizeof(float), cudaMemcpyDeviceToHost);
+                // Read the entire image data into the array
+                file.read(reinterpret_cast<char*>(input), 28*28 * sizeof(float));
+                if (!file) {
+                    std::cerr << "Error reading file or file too short!" << std::endl;
+                    return 2;
+                }
 
-    // //cout << weights.conv1.data() << " ";
-    // //printArray(test_output, 24*24*20 );
-    // float* test2 = new float[12*12*20];
-    // maxPooling(test_output, test2 , 20, 24, 2, 2);
-    dim3 threadsPerBlock1(16, 16, 1); // Example thread block size, may need adjustment
-    dim3 numBlocks1((12 + threadsPerBlock1.x - 1) / threadsPerBlock1.x,
-               (12 + threadsPerBlock1.y - 1) / threadsPerBlock1.y,
-               20);
+                file.close();
+                float*c1_input;
+                cudaMalloc(&c1_input, 28*28*1*sizeof(float));
+                cudaMemcpy(c1_input, input, 28*28*1 * sizeof(float), cudaMemcpyHostToDevice);
+                //-------------------------------Host_to_Device_Copy_of_Trained_Weights---------------------------------------//
 
-    MaxPooling<<<numBlocks1, threadsPerBlock1>>>(c1_output, p1_output, 20, 24, 2, 2);
-    cudaDeviceSynchronize();
+                float *d_conv1, *d_conv2, *d_fc1, *d_fc2; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
+                cudaMalloc(&d_conv1, 520 * sizeof(float));
+                cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice);
+                cudaMalloc(&d_conv2, 25050 * sizeof(float));
+                cudaMemcpy(d_conv2, weights.conv2, 25050 * sizeof(float), cudaMemcpyHostToDevice);
+                cudaMalloc(&d_fc1, 400500 * sizeof(float));
+                cudaMemcpy(d_fc1, weights.fc1, 400500 * sizeof(float), cudaMemcpyHostToDevice);
+                cudaMalloc(&d_fc2, 5010 * sizeof(float));
+                cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice);
+                
 
-    //printArray(test2,12*12*20 );
-    float* test3 = new float[8*8*50];
-    float* test_output = new float[12*12*20];
-    cudaMemcpy(test_output, p1_output, 12*12*20 * sizeof(float), cudaMemcpyDeviceToHost);
-    conv(test_output,  weights.conv2, test3, 20, 50, 12, 5);
-    //printArray(test3, 8*8*50);
+                //-------------------Memory alloc in device for different output of layers---------------------------------------------------//
+                float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *relu_output;
+                
+                cudaMalloc(&c1_output, 24*24*20*sizeof(float));
+                cudaMalloc(&p1_output, 12*12*20*sizeof(float));
+                cudaMalloc(&c2_output, 8*8*50*sizeof(float));
+                cudaMalloc(&p2_output, 4*4*50*sizeof(float));
+                cudaMalloc(&f1_output, 500*sizeof(float));
+                cudaMalloc(&relu_output, 500*sizeof(float)); 
+                cudaMalloc(&f2_output, 10 * sizeof(float));
+                
+            //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
+                
+            //---------------------------------------------------------------------------------------------------------------------//
+                    
+                    //printArray(input, 28*28);
+            //--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
+                dim3 c1_block(16, 16, 1); // Example thread block size
+                dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,
+                        (24 + c1_block.y - 1) / c1_block.y,
+                        20);
+
+                conv_cuda<<<c1_grid, c1_block>>>(c1_input, d_conv1, c1_output, 1, 20, 28, 5);
+                cudaDeviceSynchronize(); // Wait for the kernel to complete
+            //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
+                // float* test_output = new float[24*24*20];
+                // cudaMemcpy(test_output, c1_output, 24*24*20 * sizeof(float), cudaMemcpyDeviceToHost);
+
+                // //cout << weights.conv1.data() << " ";
+                // //printArray(test_output, 24*24*20 );
+                // float* test2 = new float[12*12*20];
+                // maxPooling(test_output, test2 , 20, 24, 2, 2);
+                dim3 p1_block(16, 16, 1); // Example thread block size, may need adjustment
+                dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,
+                        (12 + p1_block.y - 1) / p1_block.y,
+                        20);
+
+                MaxPooling<<<p1_grid, p1_block>>>(c1_output, p1_output, 20, 24, 2, 2);
+                cudaDeviceSynchronize();
+            //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
+                //printArray(test2,12*12*20 );
+                // float* test3 = new float[8*8*50];
+                // float* test_output = new float[12*12*20];
+                // cudaMemcpy(test_output, p1_output, 12*12*20 * sizeof(float), cudaMemcpyDeviceToHost);
+                // conv(test_output,  weights.conv2, test3, 20, 50, 12, 5);
+                //printArray(test3, 8*8*50);
 
 
+                dim3 c2_block(8, 8); // One thread per output pixel
+                dim3 c2_grid((8 + c2_block.x - 1) / c2_block.x,
+                        (8 + c2_block.y - 1) / c2_block.y,
+                        50); // 50 channels to process
+
+                conv_cuda<<<c2_grid, c2_block>>>(p1_output, d_conv2, c2_output, 20, 50, 12, 5);
+                cudaDeviceSynchronize();
+
+            //------------------------------------------Pool_2,8,4,50,50,2,2,0,0,-,-,-----------------------------------------------//
+                
+                dim3 p2_block(4, 4);
+                dim3 p2_grid(1, 1, 50);
+                MaxPooling<<<p2_grid, p2_block>>>(c2_output, p2_output, 50, 8, 2, 2);
+                cudaDeviceSynchronize();
+                // float* test4 = new float[4*4*50];
+                // float* test_output = new float[8*8*50];
+                // cudaMemcpy(test_output, c2_output, 8*8*50 * sizeof(float), cudaMemcpyDeviceToHost);
+                // maxPooling(test_output, test4 , 50, 8, 2, 2);
+                //printArray(test4, 4*4*50);
 
 
+            //--------------------------------------------FC_1,4,1,50,500,4,1,0,1,400000,500,400500-------------------------------------//
+                int f1_block = 256;
+                int f1_grid = (500 + f1_block - 1) / f1_block;
+                dim3 threads1(f1_block);
+                dim3 blocks1(f1_grid);
+                fconv_cudaR<<<blocks1, threads1>>>(p2_output, d_fc1, f1_output, 50, 500, 4);
+
+                // float* test5 = new float[500];
+                // float* test_output = new float[4*4*50];
+                // cudaMemcpy(test_output, p2_output, 4*4*50 * sizeof(float), cudaMemcpyDeviceToHost);
+                // fconv(test_output, weights.fc1, test5, 50, 500, 4);
+                //printArray(test5, 500);
+                // relu(test5, 500);
+                // float* test6 = new float[10];
+                // fconv(test5, weights.fc2, test6, 500, 10, 1);
+            //----------------------------------------FC_2,1,1,500,10,1,1,0,0,5000,10,5010-----------------------------------------------------//
+                // printArray(test6, 10);
+            
+                dim3 threads(32);
+                dim3 blocks(1);
+                fconv_cuda<<<blocks, threads>>>(f1_output, d_fc2, f2_output, 500, 10, 1);
+                float* test6 = new float[10];
+                cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost);
+                softmax(test6, 10);
+                // printArray(test6, 10);
+                vector<int> top_classes;
+                vector<float> top_probs;
+                findTop5(test6, 10, top_classes, top_probs);
 
 
-    float* test4 = new float[4*4*50];
-    maxPooling(test3, test4 , 50, 8, 2, 2);
-    //printArray(test4, 4*4*50);
-    float* test5 = new float[500];
-    fconv(test4, weights.fc1, test5, 50, 500, 4);
-    //printArray(test5, 500);
-    relu(test5, 500);
-    float* test6 = new float[10];
-    fconv(test5, weights.fc2, test6, 500, 10, 1);
-    // printArray(test6, 10);
-    softmax(test6, 10);
-    // printArray(test6, 10);
-    vector<int> top_classes;
-    vector<float> top_probs;
-    findTop5(test6, 10, top_classes, top_probs);
+                // Print top 5 probabilities and their classes
+                for (size_t i = 0; i < top_classes.size(); ++i) {
+                    std::cout << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
+                }
 
-
-    // Print top 5 probabilities and their classes
-    for (size_t i = 0; i < top_classes.size(); ++i) {
-        std::cout << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
+                
+                //delete[] test_output;
+                //delete[] test2;
+                //delete[] test3;
+                //delete[] test4;
+                //delete[] test5;
+                delete[] test6;
+                delete[] input;
+                cudaFree(c1_input);
+                cudaFree(c1_output);
+                cudaFree(c2_output);
+                cudaFree(p1_output);
+                cudaFree(p2_output);
+                cudaFree(d_conv1);
+                cudaFree(d_conv2); 
+                cudaFree(d_fc1); 
+                cudaFree(d_fc2);
+                cudaFree(f1_output);
+                cudaFree(relu_output);
+                cudaFree(f2_output);
+            }
+        }
+        closedir(dir);
+    } else {
+        // Could not open directory
+        std::cerr << "Could not open directory" << std::endl;
+        return EXIT_FAILURE;
     }
 
     delete[] weights.conv1;
     delete[] weights.conv2;
     delete[] weights.fc1;
     delete[] weights.fc2;
-    delete[] test_output;
-    //delete[] test2;
-    delete[] test3;
-    delete[] test4;
-    delete[] test5;
-    delete[] test6;
-    delete[] input;
-    cudaFree(c1_input);
-    cudaFree(c1_output);
-    // cudaFree(c2_output);
-    // cudaFree(p1_output);
-    // cudaFree(p2_output);
-    // cudaFree(d_conv1);
-    // cudaFree(d_conv2); 
-    // cudaFree(d_fc1); 
-    // cudaFree(d_fc2);
-    // cudaFree(f1_output);
-    // cudaFree(relu_output);
-    // cudaFree(f2_output);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time taken: %f ms\n", milliseconds);
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+
+    
 
     return 0;
+
 }
 
