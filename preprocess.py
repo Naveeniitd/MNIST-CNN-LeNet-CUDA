@@ -1,18 +1,21 @@
 import cv2
 import numpy as np
 
-# Load and preprocess the image
-img_path = '2.png'
-img = cv2.imread(img_path, 0)
-if img.shape != (28, 28):
-    img = cv2.resize(img, (28, 28))
+np.set_printoptions(linewidth=np.inf,formatter={'float': '{: 0.6f}'.format})
 
-# Revert the image and normalize it to the 0-1 range
-img = 1.0 - img / 255.0
+img = cv2.imread('000008-num5.png',0)
+if img.shape != [28,28]:
+    img2 = cv2.resize(img,(28,28))
+    
+img = img2.reshape(28,28,-1);
+# Ensure img is of type float32
+img = img.astype(np.float32)
 
-# Flatten the image to create a 1D array and ensure it's in float32 for CUDA
-img_flattened = img.flatten().astype(np.float32)
+#revert the image,and normalize it to 0-1 range
+img =img/255.0
 
-# Save the flattened image to a binary file
-binary_path = '2.bin'
-img_flattened.tofile(binary_path)
+img.tofile("000008-num5.bin")
+
+# with open('7.bin', 'rb') as file:
+#     data = np.fromfile(file, dtype=np.float32)  # Ensure dtype matches what you wrote
+#     print(data[:500]) 
