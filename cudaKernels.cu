@@ -8,16 +8,27 @@
 #include <cuda_runtime.h>
 #include <cfloat>
 #include <sstream>
-#include <iomanip>
-#include <utility>
 #include <queue>
 #include <dirent.h>
 using namespace std;
+#define CHECK_CUDA_ERROR(err) do { \
+    if (err != cudaSuccess) { \
+        std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
+                  << cudaGetErrorString(err) << std::endl; \
+        exit(EXIT_FAILURE); \
+    } \
+} while(0)
 
+#define c1_width 520
+#define f2_width 5010
+// __constant__ float d_conv1[c1_width];
+// __constant__ float d_fc2[f2_width];
 struct Weights {
-    float* conv1;
+    //float conv1[520];
     float* conv2;
     float* fc1;
+    //float fc2[5010];
+    float* conv1;
     float* fc2;
     
 };
@@ -322,7 +333,7 @@ void findTop5(const float* softmax_probs, int num_classes, std::vector<int>& top
     std::reverse(top_probs.begin(), top_probs.end());
 }
 //--------------------------Function-to-read-trained-weights---------------------------//
-float* fileRead(const string& path, int size) {
+float* fileReadP(const string& path, int size) {
     ifstream file(path);
     if (!file.is_open()) {
         cerr << "Failed to open file: " << path << endl;
@@ -339,6 +350,21 @@ float* fileRead(const string& path, int size) {
     file.close();
     return weights;
 }
+bool fileRead(const string& path, float* weights, int size) {
+    ifstream file(path);
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << path << endl;
+        return false;
+    }
+    for (int i = 0; i < size; i++) {
+        if (!(file >> weights[i])) {
+            cerr << "Failed to read weight at position " << i << " from file: " << path << endl;
+            return false;
+        }
+    }
+    file.close();
+    return true;
+}
 //------------------------------------relu-------------------------------------------------------------//
 void relu(float* input, int size) {
     for (int i = 0; i < size; i++) {
@@ -354,24 +380,49 @@ bool imgload(const string& path, float* input){
     return true;
 }
 
-//------------------------------------MAIN FUNCTION-----------------------------------------//
+//------------------------------------MAIN FUNCTION----------------------------
+
 int main() {
 
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
-    weights.conv1 = fileRead("trained_weights/conv1.txt", 520);
-    weights.conv2 = fileRead("trained_weights/conv2.txt", 25050);
-    weights.fc1 = fileRead("trained_weights/fc1.txt", 400500);
-    weights.fc2 = fileRead("trained_weights/fc2.txt", 5010);
-    // printArray(weights.conv1, 520);
+    // if (!fileReadP("trained_weights/conv1.txt", weights.conv1, 520)) {
+    //     // Handle error
+    //     return -1;}
+    weights.conv1 = fileReadP("trained_weights/conv1.txt", 520);
+    weights.conv2 = fileReadP("trained_weights/conv2.txt", 25050);
+    weights.fc1 = fileReadP("trained_weights/fc1.txt", 400500);
+    weights.fc2 = fileReadP("trained_weights/fc2.txt", 5010);
+    // if (!fileReadP("trained_weights/fc2.txt", weights.fc2, 5010)) {
+    //     // Handle error
+    //     return -1;}
+        //printArray(weights.conv1, 520);
+        //printArray(weights.fc1, 400500);
+        //printArray(weights.conv2, 25050);
+    //printArray(weights.fc2, 5010);
+    float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
+    CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
+    CHECK_CUDA_ERROR(cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA_ERROR(cudaMalloc(&d_conv2, 25050 * sizeof(float)));
+    CHECK_CUDA_ERROR(cudaMemcpy(d_conv2, weights.conv2, 25050 * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA_ERROR(cudaMalloc(&d_fc1, 400500 * sizeof(float)));
+    CHECK_CUDA_ERROR(cudaMemcpy(d_fc1, weights.fc1, 400500 * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA_ERROR(cudaMalloc(&d_fc2, 5010 * sizeof(float)));
+    CHECK_CUDA_ERROR(cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice));
+             
+    const int num_streams = 4; // Example: Process 4 images concurrently
+    cudaStream_t streams[num_streams];
+    for (int i = 0; i < num_streams; i++) {
+        cudaStreamCreate(&streams[i]);
+    }
     
     std::string directory = "binary_test/";
     DIR* dir;
     struct dirent* ent;
     cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    cudaEventRecord(start);
+    CHECK_CUDA_ERROR(cudaEventCreate(&start));
+    CHECK_CUDA_ERROR(cudaEventCreate(&stop));
+    CHECK_CUDA_ERROR(cudaEventRecord(start));
     if ((dir = opendir(directory.c_str())) != nullptr) {
         while ((ent = readdir(dir)) != nullptr) {
             std::string filename = ent->d_name;
@@ -397,31 +448,22 @@ int main() {
 
                 file.close();
                 float*c1_input;
-                cudaMalloc(&c1_input, 28*28*1*sizeof(float));
-                cudaMemcpy(c1_input, input, 28*28*1 * sizeof(float), cudaMemcpyHostToDevice);
+                CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*1*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input, 28*28*1 * sizeof(float), cudaMemcpyHostToDevice));
                 //-------------------------------Host_to_Device_Copy_of_Trained_Weights---------------------------------------//
 
-                float *d_conv1, *d_conv2, *d_fc1, *d_fc2; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
-                cudaMalloc(&d_conv1, 520 * sizeof(float));
-                cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice);
-                cudaMalloc(&d_conv2, 25050 * sizeof(float));
-                cudaMemcpy(d_conv2, weights.conv2, 25050 * sizeof(float), cudaMemcpyHostToDevice);
-                cudaMalloc(&d_fc1, 400500 * sizeof(float));
-                cudaMemcpy(d_fc1, weights.fc1, 400500 * sizeof(float), cudaMemcpyHostToDevice);
-                cudaMalloc(&d_fc2, 5010 * sizeof(float));
-                cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice);
                 
 
                 //-------------------Memory alloc in device for different output of layers---------------------------------------------------//
                 float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *relu_output;
                 
-                cudaMalloc(&c1_output, 24*24*20*sizeof(float));
-                cudaMalloc(&p1_output, 12*12*20*sizeof(float));
-                cudaMalloc(&c2_output, 8*8*50*sizeof(float));
-                cudaMalloc(&p2_output, 4*4*50*sizeof(float));
-                cudaMalloc(&f1_output, 500*sizeof(float));
-                cudaMalloc(&relu_output, 500*sizeof(float)); 
-                cudaMalloc(&f2_output, 10 * sizeof(float));
+                CHECK_CUDA_ERROR(cudaMalloc(&c1_output, 24*24*20*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMalloc(&p1_output, 12*12*20*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMalloc(&c2_output, 8*8*50*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMalloc(&p2_output, 4*4*50*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMalloc(&f1_output, 500*sizeof(float)));
+                CHECK_CUDA_ERROR(cudaMalloc(&relu_output, 500*sizeof(float))); 
+                CHECK_CUDA_ERROR(cudaMalloc(&f2_output, 10 * sizeof(float)));
                 
             //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
                 
@@ -436,7 +478,11 @@ int main() {
 
                 conv_cuda<<<c1_grid, c1_block>>>(c1_input, d_conv1, c1_output, 1, 20, 28, 5);
                 cudaDeviceSynchronize(); // Wait for the kernel to complete
-            //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
+                cudaError_t error = cudaGetLastError();
+                if (error != cudaSuccess) {
+                    std::cerr << "Error during conv_cuda_1 execution: " << cudaGetErrorString(error) << std::endl;
+                }
+        //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
                 // float* test_output = new float[24*24*20];
                 // cudaMemcpy(test_output, c1_output, 24*24*20 * sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -451,7 +497,11 @@ int main() {
 
                 MaxPooling<<<p1_grid, p1_block>>>(c1_output, p1_output, 20, 24, 2, 2);
                 cudaDeviceSynchronize();
-            //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
+                cudaError_t error1 = cudaGetLastError();
+                if (error1 != cudaSuccess) {
+                    std::cerr << "Error during Max_pool_1 execution: " << cudaGetErrorString(error1) << std::endl;
+                }
+        //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
                 //printArray(test2,12*12*20 );
                 // float* test3 = new float[8*8*50];
                 // float* test_output = new float[12*12*20];
@@ -467,13 +517,20 @@ int main() {
 
                 conv_cuda<<<c2_grid, c2_block>>>(p1_output, d_conv2, c2_output, 20, 50, 12, 5);
                 cudaDeviceSynchronize();
-
+                cudaError_t error2 = cudaGetLastError();
+                if (error2 != cudaSuccess) {
+                    std::cerr << "Error during conv_cuda_2 execution: " << cudaGetErrorString(error2) << std::endl;
+                }
             //------------------------------------------Pool_2,8,4,50,50,2,2,0,0,-,-,-----------------------------------------------//
                 
                 dim3 p2_block(4, 4);
                 dim3 p2_grid(1, 1, 50);
                 MaxPooling<<<p2_grid, p2_block>>>(c2_output, p2_output, 50, 8, 2, 2);
                 cudaDeviceSynchronize();
+                cudaError_t error3 = cudaGetLastError();
+                if (error3 != cudaSuccess) {
+                    std::cerr << "Error during Max_pool_2 execution: " << cudaGetErrorString(error3) << std::endl;
+                }
                 // float* test4 = new float[4*4*50];
                 // float* test_output = new float[8*8*50];
                 // cudaMemcpy(test_output, c2_output, 8*8*50 * sizeof(float), cudaMemcpyDeviceToHost);
@@ -487,7 +544,10 @@ int main() {
                 dim3 threads1(f1_block);
                 dim3 blocks1(f1_grid);
                 fconv_cudaR<<<blocks1, threads1>>>(p2_output, d_fc1, f1_output, 50, 500, 4);
-
+                cudaError_t error4 = cudaGetLastError();
+                if (error4 != cudaSuccess) {
+                    std::cerr << "Error during fully_conv_cuda_1 execution: " << cudaGetErrorString(error4) << std::endl;
+                }
                 // float* test5 = new float[500];
                 // float* test_output = new float[4*4*50];
                 // cudaMemcpy(test_output, p2_output, 4*4*50 * sizeof(float), cudaMemcpyDeviceToHost);
@@ -502,8 +562,12 @@ int main() {
                 dim3 threads(32);
                 dim3 blocks(1);
                 fconv_cuda<<<blocks, threads>>>(f1_output, d_fc2, f2_output, 500, 10, 1);
+                cudaError_t error5 = cudaGetLastError();
+                if (error5 != cudaSuccess) {
+                    std::cerr << "Error during fully_conv_cuda_2 execution: " << cudaGetErrorString(error5) << std::endl;
+                }
                 float* test6 = new float[10];
-                cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost);
+                CHECK_CUDA_ERROR(cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost));
                 softmax(test6, 10);
                 // printArray(test6, 10);
                 vector<int> top_classes;
@@ -511,7 +575,7 @@ int main() {
                 findTop5(test6, 10, top_classes, top_probs);
 
 
-                // Print top 5 probabilities and their classes
+                //Print top 5 probabilities and their classes
                 for (size_t i = 0; i < top_classes.size(); ++i) {
                     std::cout << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
                 }
@@ -524,18 +588,18 @@ int main() {
                 //delete[] test5;
                 delete[] test6;
                 delete[] input;
-                cudaFree(c1_input);
-                cudaFree(c1_output);
-                cudaFree(c2_output);
-                cudaFree(p1_output);
-                cudaFree(p2_output);
-                cudaFree(d_conv1);
-                cudaFree(d_conv2); 
-                cudaFree(d_fc1); 
-                cudaFree(d_fc2);
-                cudaFree(f1_output);
-                cudaFree(relu_output);
-                cudaFree(f2_output);
+                CHECK_CUDA_ERROR(cudaFree(c1_input));
+                CHECK_CUDA_ERROR(cudaFree(c1_output));
+                CHECK_CUDA_ERROR(cudaFree(c2_output));
+                CHECK_CUDA_ERROR(cudaFree(p1_output));
+                CHECK_CUDA_ERROR(cudaFree(p2_output));
+                
+                CHECK_CUDA_ERROR(cudaFree(f1_output));
+                CHECK_CUDA_ERROR(cudaFree(relu_output));
+                CHECK_CUDA_ERROR(cudaFree(f2_output));
+                // float test[520];
+                // CHECK_CUDA_ERROR(cudaMemcpyFromSymbol(test, d_fc2, 5010 * sizeof(float)));
+                //printArray(test, 520);
             }
         }
         closedir(dir);
@@ -544,18 +608,27 @@ int main() {
         std::cerr << "Could not open directory" << std::endl;
         return EXIT_FAILURE;
     }
+    for (int i = 0; i < num_streams; i++) {
+        cudaStreamSynchronize(streams[i]);
+    }
+    for (int i = 0; i < num_streams; i++) {
+        cudaStreamDestroy(streams[i]);
+    }
 
-    delete[] weights.conv1;
     delete[] weights.conv2;
     delete[] weights.fc1;
-    delete[] weights.fc2;
-    cudaEventRecord(stop);
-    cudaEventSynchronize(stop);
+
+    CHECK_CUDA_ERROR(cudaFree(d_conv1));
+    CHECK_CUDA_ERROR(cudaFree(d_conv2)); 
+    CHECK_CUDA_ERROR(cudaFree(d_fc1)); 
+    CHECK_CUDA_ERROR(cudaFree(d_fc2));
+    CHECK_CUDA_ERROR(cudaEventRecord(stop));
+    CHECK_CUDA_ERROR(cudaEventSynchronize(stop));
     float milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
+    CHECK_CUDA_ERROR(cudaEventElapsedTime(&milliseconds, start, stop));
     printf("Time taken: %f ms\n", milliseconds);
-    cudaEventDestroy(start);
-    cudaEventDestroy(stop);
+    CHECK_CUDA_ERROR(cudaEventDestroy(start));
+    CHECK_CUDA_ERROR(cudaEventDestroy(stop));
 
     
 
