@@ -1,0 +1,700 @@
+Batch Item 1
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 2
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 3
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 4
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 5
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 6
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 7
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 8
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 9
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 10
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 11
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 12
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 13
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 14
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 15
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 16
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 17
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 18
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 19
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 20
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 21
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 22
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 23
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 24
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 25
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 26
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 27
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 28
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 29
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 30
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 31
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 32
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 33
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 34
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 35
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 36
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 37
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 38
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 39
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 40
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 41
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 42
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 43
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 44
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 45
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 46
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 47
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 48
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 49
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 50
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 51
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 52
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 53
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 54
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 55
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 56
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 57
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 58
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 59
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 60
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 61
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 62
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 63
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 64
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 65
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 66
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 67
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 68
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 69
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 70
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 71
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 72
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 73
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 74
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 75
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 76
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 77
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 78
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 79
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 80
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 81
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 82
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 83
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 84
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 85
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 86
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 87
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 88
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 89
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 90
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 91
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 92
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 93
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 94
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 95
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 96
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 97
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 98
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 99
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------
+Batch Item 100
+Class 1 Probability: 0.620161
+Class 7 Probability: 0.136158
+Class 5 Probability: 0.0537727
+Class 4 Probability: 0.0515435
+Class 6 Probability: 0.0436878
+---------------------------------------------------

@@ -383,16 +383,17 @@ bool imgload(const string& path, float* input){
 //------------------------------------MAIN FUNCTION----------------------------
 
 int main() {
-
+    string saveDirectory = "output/";
+    string fileExtension = ".txt";
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
     // if (!fileReadP("trained_weights/conv1.txt", weights.conv1, 520)) {
     //     // Handle error
     //     return -1;}
-    weights.conv1 = fileReadP("trained_weights/conv1.txt", 520);
-    weights.conv2 = fileReadP("trained_weights/conv2.txt", 25050);
-    weights.fc1 = fileReadP("trained_weights/fc1.txt", 400500);
-    weights.fc2 = fileReadP("trained_weights/fc2.txt", 5010);
+    weights.conv1 = fileReadP("weights/conv1.txt", 520);
+    weights.conv2 = fileReadP("weights/conv2.txt", 25050);
+    weights.fc1 = fileReadP("weights/fc1.txt", 400500);
+    weights.fc2 = fileReadP("weights/fc2.txt", 5010);
     // if (!fileReadP("trained_weights/fc2.txt", weights.fc2, 5010)) {
     //     // Handle error
     //     return -1;}
@@ -444,9 +445,6 @@ int main() {
                 float*c1_input;
                 CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*1*sizeof(float)));
                 CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input, 28*28*1 * sizeof(float), cudaMemcpyHostToDevice));
-                //-------------------------------Host_to_Device_Copy_of_Trained_Weights---------------------------------------//
-
-                
 
                 //-------------------Memory alloc in device for different output of layers---------------------------------------------------//
                 float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *relu_output;
@@ -461,9 +459,6 @@ int main() {
                 
             //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
                 
-            //---------------------------------------------------------------------------------------------------------------------//
-                    
-                    //printArray(input, 28*28);
             //--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
                 dim3 c1_block(16, 16, 1); // Example thread block size
                 dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,
@@ -484,7 +479,7 @@ int main() {
                 // //printArray(test_output, 24*24*20 );
                 // float* test2 = new float[12*12*20];
                 // maxPooling(test_output, test2 , 20, 24, 2, 2);
-                dim3 p1_block(16, 16, 1); // Example thread block size, may need adjustment
+                dim3 p1_block(16, 16, 1); 
                 dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,
                         (12 + p1_block.y - 1) / p1_block.y,
                         20);
@@ -504,10 +499,10 @@ int main() {
                 //printArray(test3, 8*8*50);
 
 
-                dim3 c2_block(8, 8); // One thread per output pixel
+                dim3 c2_block(8, 8); 
                 dim3 c2_grid((8 + c2_block.x - 1) / c2_block.x,
                         (8 + c2_block.y - 1) / c2_block.y,
-                        50); // 50 channels to process
+                        50); 
 
                 conv_cuda<<<c2_grid, c2_block>>>(p1_output, d_conv2, c2_output, 20, 50, 12, 5);
                 cudaDeviceSynchronize();
@@ -551,8 +546,7 @@ int main() {
                 // float* test6 = new float[10];
                 // fconv(test5, weights.fc2, test6, 500, 10, 1);
             //----------------------------------------FC_2,1,1,500,10,1,1,0,0,5000,10,5010-----------------------------------------------------//
-                // printArray(test6, 10);
-            
+              
                 dim3 threads(32);
                 dim3 blocks(1);
                 fconv_cuda<<<blocks, threads>>>(f1_output, d_fc2, f2_output, 500, 10, 1);
@@ -560,40 +554,39 @@ int main() {
                 if (error5 != cudaSuccess) {
                     std::cerr << "Error during fully_conv_cuda_2 execution: " << cudaGetErrorString(error5) << std::endl;
                 }
+
+
+
+            //-------------------------------------------SOFTMAX PROBABILITIES---------------------------------------------------------------------------//
                 float* test6 = new float[10];
                 CHECK_CUDA_ERROR(cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost));
-                softmax(test6, 10);
-                // printArray(test6, 10);
+                softmax(test6, 10);     
                 vector<int> top_classes;
                 vector<float> top_probs;
                 findTop5(test6, 10, top_classes, top_probs);
-
-
-                //Print top 5 probabilities and their classes
-                for (size_t i = 0; i < top_classes.size(); ++i) {
-                    std::cout << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
+                string savePath = saveDirectory + filename.substr(0, filename.length() - 4) + "_top5" + fileExtension; // Assuming filename has '.bin' extension
+                // Open a file stream to write
+                std::ofstream outFile(savePath);
+                if (!outFile.is_open()) {
+                    std::cerr << "Failed to open file for writing: " << savePath << std::endl;
+                    return -1; // or handle the error based on your application's needs
                 }
 
-                
-                //delete[] test_output;
-                //delete[] test2;
-                //delete[] test3;
-                //delete[] test4;
-                //delete[] test5;
+                // Write top 5 probabilities and their classes to the file
+                for (size_t i = 0; i < top_classes.size(); ++i) {
+                    outFile << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
+                }
+                outFile.close();
                 delete[] test6;
                 delete[] input;
                 CHECK_CUDA_ERROR(cudaFree(c1_input));
                 CHECK_CUDA_ERROR(cudaFree(c1_output));
                 CHECK_CUDA_ERROR(cudaFree(c2_output));
                 CHECK_CUDA_ERROR(cudaFree(p1_output));
-                CHECK_CUDA_ERROR(cudaFree(p2_output));
-                
+                CHECK_CUDA_ERROR(cudaFree(p2_output)); 
                 CHECK_CUDA_ERROR(cudaFree(f1_output));
                 CHECK_CUDA_ERROR(cudaFree(relu_output));
                 CHECK_CUDA_ERROR(cudaFree(f2_output));
-                // float test[520];
-                // CHECK_CUDA_ERROR(cudaMemcpyFromSymbol(test, d_fc2, 5010 * sizeof(float)));
-                //printArray(test, 520);
             }
         }
         closedir(dir);
@@ -601,11 +594,9 @@ int main() {
         // Could not open directory
         std::cerr << "Could not open directory" << std::endl;
         return EXIT_FAILURE;
-    }
-    
+    }   
     delete[] weights.conv2;
     delete[] weights.fc1;
-
     CHECK_CUDA_ERROR(cudaFree(d_conv1));
     CHECK_CUDA_ERROR(cudaFree(d_conv2)); 
     CHECK_CUDA_ERROR(cudaFree(d_fc1)); 
@@ -616,11 +607,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaEventElapsedTime(&milliseconds, start, stop));
     printf("Time taken: %f ms\n", milliseconds);
     CHECK_CUDA_ERROR(cudaEventDestroy(start));
-    CHECK_CUDA_ERROR(cudaEventDestroy(stop));
-
-    
-
+    CHECK_CUDA_ERROR(cudaEventDestroy(stop)); 
     return 0;
-
 }
 
