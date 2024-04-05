@@ -450,7 +450,7 @@ int main() {
             //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
                 
             //--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
-                dim3 c1_block(16, 16, 1); // Example thread block size
+                dim3 c1_block(16, 16, 1); 
                 dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,
                         (24 + c1_block.y - 1) / c1_block.y,
                         20);
