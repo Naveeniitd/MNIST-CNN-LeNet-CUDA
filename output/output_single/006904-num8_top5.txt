@@ -1,0 +1,5 @@
+Class 8 Probability: 0.999988
+Class 2 Probability: 1.10876e-05
+Class 3 Probability: 5.45612e-07
+Class 9 Probability: 3.72641e-08
+Class 6 Probability: 3.4628e-09

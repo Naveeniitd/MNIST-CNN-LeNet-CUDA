@@ -1,0 +1,5 @@
+Class 4 Probability: 0.998709
+Class 9 Probability: 0.000830818
+Class 2 Probability: 0.000416471
+Class 1 Probability: 1.53514e-05
+Class 5 Probability: 1.27642e-05

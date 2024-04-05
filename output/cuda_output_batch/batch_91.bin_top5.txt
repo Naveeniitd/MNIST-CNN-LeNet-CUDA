@@ -1,0 +1,700 @@
+Image 1:
+Class 3, Probability: 1
+Class 2, Probability: 2.85592e-08
+Class 8, Probability: 2.3538e-08
+Class 5, Probability: 1.41368e-08
+Class 9, Probability: 4.2309e-11
+
+Image 2:
+Class 4, Probability: 0.978417
+Class 9, Probability: 0.0201471
+Class 7, Probability: 0.00142123
+Class 8, Probability: 8.31784e-06
+Class 3, Probability: 2.41685e-06
+
+Image 3:
+Class 7, Probability: 0.996452
+Class 8, Probability: 0.00172422
+Class 3, Probability: 0.00157053
+Class 2, Probability: 0.000146869
+Class 9, Probability: 6.62966e-05
+
+Image 4:
+Class 3, Probability: 1
+Class 7, Probability: 3.35918e-08
+Class 9, Probability: 2.78997e-08
+Class 8, Probability: 4.65733e-10
+Class 5, Probability: 4.84979e-11
+
+Image 5:
+Class 3, Probability: 1
+Class 5, Probability: 4.96957e-09
+Class 7, Probability: 5.66491e-10
+Class 8, Probability: 3.25688e-10
+Class 9, Probability: 1.68283e-10
+
+Image 6:
+Class 1, Probability: 0.999988
+Class 7, Probability: 8.3267e-06
+Class 4, Probability: 2.34807e-06
+Class 8, Probability: 5.62938e-07
+Class 9, Probability: 3.66993e-07
+
+Image 7:
+Class 1, Probability: 0.999908
+Class 4, Probability: 3.04667e-05
+Class 7, Probability: 3.0127e-05
+Class 6, Probability: 1.91189e-05
+Class 8, Probability: 8.56205e-06
+
+Image 8:
+Class 0, Probability: 0.999676
+Class 2, Probability: 0.000173831
+Class 8, Probability: 0.000116415
+Class 6, Probability: 2.15264e-05
+Class 4, Probability: 1.04053e-05
+
+Image 9:
+Class 5, Probability: 1
+Class 3, Probability: 3.36368e-10
+Class 9, Probability: 1.36602e-10
+Class 8, Probability: 4.72434e-12
+Class 6, Probability: 7.96538e-14
+
+Image 10:
+Class 2, Probability: 0.999826
+Class 3, Probability: 0.000119525
+Class 8, Probability: 4.12674e-05
+Class 0, Probability: 1.07823e-05
+Class 6, Probability: 1.86281e-06
+
+Image 11:
+Class 4, Probability: 0.999996
+Class 9, Probability: 1.91373e-06
+Class 7, Probability: 1.62194e-06
+Class 8, Probability: 9.62909e-08
+Class 1, Probability: 1.8696e-08
+
+Image 12:
+Class 6, Probability: 0.999988
+Class 5, Probability: 9.38781e-06
+Class 0, Probability: 3.03124e-06
+Class 8, Probability: 7.57831e-09
+Class 4, Probability: 1.48441e-10
+
+Image 13:
+Class 0, Probability: 1
+Class 6, Probability: 1.8174e-09
+Class 2, Probability: 1.73265e-09
+Class 7, Probability: 1.42075e-09
+Class 9, Probability: 4.02153e-10
+
+Image 14:
+Class 2, Probability: 0.999991
+Class 8, Probability: 4.54309e-06
+Class 7, Probability: 2.87936e-06
+Class 3, Probability: 7.14402e-07
+Class 1, Probability: 3.18749e-07
+
+Image 15:
+Class 0, Probability: 1
+Class 6, Probability: 2.75613e-07
+Class 7, Probability: 6.1409e-08
+Class 9, Probability: 8.06836e-09
+Class 2, Probability: 7.46183e-09
+
+Image 16:
+Class 4, Probability: 1
+Class 9, Probability: 7.78175e-08
+Class 7, Probability: 1.14793e-08
+Class 1, Probability: 1.89697e-09
+Class 5, Probability: 5.60973e-10
+
+Image 17:
+Class 1, Probability: 0.999981
+Class 7, Probability: 9.4378e-06
+Class 2, Probability: 5.75898e-06
+Class 8, Probability: 2.26948e-06
+Class 0, Probability: 1.40844e-06
+
+Image 18:
+Class 1, Probability: 0.633279
+Class 7, Probability: 0.336235
+Class 2, Probability: 0.0235976
+Class 8, Probability: 0.00416864
+Class 3, Probability: 0.00241062
+
+Image 19:
+Class 8, Probability: 0.999969
+Class 2, Probability: 2.30386e-05
+Class 3, Probability: 7.30437e-06
+Class 9, Probability: 2.43331e-07
+Class 0, Probability: 5.5345e-09
+
+Image 20:
+Class 8, Probability: 0.999387
+Class 2, Probability: 0.000325024
+Class 0, Probability: 0.000202122
+Class 9, Probability: 5.843e-05
+Class 5, Probability: 2.10495e-05
+
+Image 21:
+Class 4, Probability: 0.99951
+Class 0, Probability: 0.000262167
+Class 6, Probability: 0.000220624
+Class 2, Probability: 6.96869e-06
+Class 1, Probability: 1.90635e-07
+
+Image 22:
+Class 6, Probability: 0.999746
+Class 0, Probability: 0.000238585
+Class 5, Probability: 1.47957e-05
+Class 1, Probability: 3.54499e-07
+Class 4, Probability: 8.18302e-08
+
+Image 23:
+Class 1, Probability: 0.999977
+Class 4, Probability: 1.7092e-05
+Class 2, Probability: 3.90427e-06
+Class 7, Probability: 1.60706e-06
+Class 8, Probability: 7.74989e-07
+
+Image 24:
+Class 6, Probability: 1
+Class 5, Probability: 1.12099e-07
+Class 8, Probability: 4.9646e-09
+Class 3, Probability: 1.92693e-10
+Class 2, Probability: 4.52638e-11
+
+Image 25:
+Class 8, Probability: 0.999994
+Class 9, Probability: 3.33434e-06
+Class 3, Probability: 1.17239e-06
+Class 2, Probability: 1.09115e-06
+Class 5, Probability: 7.10029e-09
+
+Image 26:
+Class 9, Probability: 0.999869
+Class 4, Probability: 8.19262e-05
+Class 8, Probability: 3.75394e-05
+Class 7, Probability: 9.0847e-06
+Class 0, Probability: 1.45537e-06
+
+Image 27:
+Class 8, Probability: 0.999985
+Class 3, Probability: 1.44387e-05
+Class 5, Probability: 4.88033e-08
+Class 9, Probability: 4.75702e-08
+Class 2, Probability: 1.4997e-09
+
+Image 28:
+Class 2, Probability: 1
+Class 1, Probability: 2.81046e-08
+Class 8, Probability: 2.78997e-09
+Class 7, Probability: 1.55646e-09
+Class 3, Probability: 4.57903e-10
+
+Image 29:
+Class 6, Probability: 0.999999
+Class 4, Probability: 8.47326e-07
+Class 0, Probability: 1.7572e-08
+Class 5, Probability: 1.83187e-10
+Class 8, Probability: 9.88257e-11
+
+Image 30:
+Class 3, Probability: 0.999927
+Class 8, Probability: 4.61547e-05
+Class 2, Probability: 1.78571e-05
+Class 9, Probability: 4.94578e-06
+Class 5, Probability: 1.83169e-06
+
+Image 31:
+Class 5, Probability: 0.999959
+Class 9, Probability: 2.97832e-05
+Class 3, Probability: 6.70902e-06
+Class 8, Probability: 1.87855e-06
+Class 7, Probability: 1.84953e-06
+
+Image 32:
+Class 5, Probability: 0.999974
+Class 3, Probability: 2.54507e-05
+Class 8, Probability: 5.4852e-07
+Class 9, Probability: 7.4816e-08
+Class 0, Probability: 5.15147e-09
+
+Image 33:
+Class 1, Probability: 0.999985
+Class 7, Probability: 1.086e-05
+Class 4, Probability: 2.7264e-06
+Class 9, Probability: 8.89497e-07
+Class 8, Probability: 5.97483e-07
+
+Image 34:
+Class 4, Probability: 0.999998
+Class 6, Probability: 1.26287e-06
+Class 0, Probability: 3.34765e-07
+Class 8, Probability: 8.1396e-08
+Class 7, Probability: 1.85079e-08
+
+Image 35:
+Class 5, Probability: 0.999907
+Class 6, Probability: 5.24608e-05
+Class 3, Probability: 3.48298e-05
+Class 4, Probability: 4.68055e-06
+Class 1, Probability: 8.92515e-07
+
+Image 36:
+Class 2, Probability: 0.999963
+Class 8, Probability: 3.22254e-05
+Class 3, Probability: 3.49282e-06
+Class 1, Probability: 7.10538e-07
+Class 7, Probability: 1.41e-07
+
+Image 37:
+Class 2, Probability: 0.999572
+Class 7, Probability: 0.000424028
+Class 1, Probability: 2.81874e-06
+Class 3, Probability: 7.41056e-07
+Class 8, Probability: 1.15237e-08
+
+Image 38:
+Class 0, Probability: 1
+Class 6, Probability: 4.13844e-08
+Class 2, Probability: 1.97849e-09
+Class 7, Probability: 1.86306e-09
+Class 9, Probability: 1.44337e-09
+
+Image 39:
+Class 7, Probability: 0.918803
+Class 9, Probability: 0.0681211
+Class 0, Probability: 0.00992805
+Class 2, Probability: 0.00302173
+Class 8, Probability: 0.000117567
+
+Image 40:
+Class 2, Probability: 1
+Class 3, Probability: 1.10206e-09
+Class 7, Probability: 4.87227e-11
+Class 4, Probability: 4.87021e-11
+Class 1, Probability: 3.74969e-11
+
+Image 41:
+Class 7, Probability: 0.999956
+Class 3, Probability: 3.82375e-05
+Class 2, Probability: 3.36191e-06
+Class 9, Probability: 1.23695e-06
+Class 1, Probability: 7.13368e-07
+
+Image 42:
+Class 9, Probability: 0.999919
+Class 7, Probability: 3.86326e-05
+Class 4, Probability: 2.95917e-05
+Class 5, Probability: 6.0417e-06
+Class 0, Probability: 3.53897e-06
+
+Image 43:
+Class 8, Probability: 0.997326
+Class 3, Probability: 0.00267349
+Class 9, Probability: 6.13106e-07
+Class 2, Probability: 2.50919e-07
+Class 5, Probability: 6.54137e-08
+
+Image 44:
+Class 2, Probability: 0.999141
+Class 7, Probability: 0.000689814
+Class 3, Probability: 0.00016466
+Class 4, Probability: 1.88084e-06
+Class 5, Probability: 1.44394e-06
+
+Image 45:
+Class 3, Probability: 1
+Class 8, Probability: 5.9434e-10
+Class 9, Probability: 9.78624e-13
+Class 5, Probability: 6.61525e-13
+Class 2, Probability: 4.12816e-13
+
+Image 46:
+Class 2, Probability: 0.999983
+Class 7, Probability: 1.24215e-05
+Class 8, Probability: 3.34653e-06
+Class 3, Probability: 1.37806e-06
+Class 1, Probability: 7.84746e-08
+
+Image 47:
+Class 6, Probability: 1
+Class 8, Probability: 4.09719e-09
+Class 5, Probability: 3.11967e-09
+Class 0, Probability: 2.37148e-10
+Class 4, Probability: 1.52493e-10
+
+Image 48:
+Class 6, Probability: 1
+Class 4, Probability: 6.39134e-09
+Class 3, Probability: 4.94163e-09
+Class 8, Probability: 4.12975e-09
+Class 0, Probability: 2.54588e-09
+
+Image 49:
+Class 7, Probability: 0.999997
+Class 9, Probability: 1.36634e-06
+Class 3, Probability: 6.84451e-07
+Class 1, Probability: 5.87443e-07
+Class 5, Probability: 8.07252e-08
+
+Image 50:
+Class 3, Probability: 1
+Class 9, Probability: 3.52955e-08
+Class 8, Probability: 1.39815e-09
+Class 2, Probability: 2.28329e-10
+Class 5, Probability: 2.74063e-11
+
+Image 51:
+Class 2, Probability: 0.999864
+Class 1, Probability: 0.000110579
+Class 7, Probability: 1.15744e-05
+Class 8, Probability: 7.96555e-06
+Class 0, Probability: 3.57927e-06
+
+Image 52:
+Class 6, Probability: 0.999996
+Class 4, Probability: 3.473e-06
+Class 5, Probability: 1.89778e-07
+Class 8, Probability: 1.138e-08
+Class 0, Probability: 6.89856e-09
+
+Image 53:
+Class 3, Probability: 1
+Class 7, Probability: 1.28916e-09
+Class 5, Probability: 1.42855e-10
+Class 9, Probability: 1.07703e-10
+Class 8, Probability: 7.50111e-12
+
+Image 54:
+Class 3, Probability: 0.720099
+Class 9, Probability: 0.247642
+Class 5, Probability: 0.0169602
+Class 8, Probability: 0.0152933
+Class 1, Probability: 2.52067e-06
+
+Image 55:
+Class 7, Probability: 0.996807
+Class 3, Probability: 0.00165926
+Class 2, Probability: 0.00152702
+Class 9, Probability: 4.00671e-06
+Class 8, Probability: 1.42718e-06
+
+Image 56:
+Class 4, Probability: 0.999949
+Class 8, Probability: 3.14098e-05
+Class 6, Probability: 1.13214e-05
+Class 1, Probability: 3.75098e-06
+Class 7, Probability: 2.40553e-06
+
+Image 57:
+Class 2, Probability: 0.999682
+Class 7, Probability: 0.000308673
+Class 3, Probability: 8.31674e-06
+Class 1, Probability: 2.53448e-07
+Class 4, Probability: 2.44136e-07
+
+Image 58:
+Class 5, Probability: 0.999995
+Class 3, Probability: 3.64642e-06
+Class 8, Probability: 5.02337e-07
+Class 9, Probability: 3.02337e-07
+Class 6, Probability: 3.027e-08
+
+Image 59:
+Class 3, Probability: 1
+Class 9, Probability: 9.43664e-08
+Class 5, Probability: 2.6437e-08
+Class 8, Probability: 2.16457e-08
+Class 2, Probability: 8.05325e-09
+
+Image 60:
+Class 9, Probability: 0.999974
+Class 4, Probability: 2.49872e-05
+Class 8, Probability: 6.28944e-07
+Class 3, Probability: 2.64037e-07
+Class 7, Probability: 9.83886e-08
+
+Image 61:
+Class 4, Probability: 1
+Class 6, Probability: 1.5836e-07
+Class 8, Probability: 2.29799e-08
+Class 7, Probability: 1.72176e-08
+Class 1, Probability: 1.59101e-08
+
+Image 62:
+Class 4, Probability: 1
+Class 9, Probability: 2.51512e-07
+Class 7, Probability: 7.04956e-08
+Class 1, Probability: 8.57247e-09
+Class 6, Probability: 8.23956e-09
+
+Image 63:
+Class 8, Probability: 0.999989
+Class 2, Probability: 1.0395e-05
+Class 3, Probability: 3.71701e-07
+Class 9, Probability: 6.57237e-08
+Class 0, Probability: 3.28216e-09
+
+Image 64:
+Class 8, Probability: 0.999994
+Class 3, Probability: 5.65521e-06
+Class 9, Probability: 6.26616e-08
+Class 2, Probability: 2.08381e-08
+Class 0, Probability: 8.03809e-09
+
+Image 65:
+Class 8, Probability: 0.999926
+Class 3, Probability: 5.92827e-05
+Class 6, Probability: 8.43668e-06
+Class 2, Probability: 3.34327e-06
+Class 5, Probability: 2.16591e-06
+
+Image 66:
+Class 9, Probability: 0.999989
+Class 4, Probability: 7.91407e-06
+Class 8, Probability: 2.1024e-06
+Class 7, Probability: 4.92096e-07
+Class 3, Probability: 5.09233e-08
+
+Image 67:
+Class 1, Probability: 0.999976
+Class 4, Probability: 1.48476e-05
+Class 2, Probability: 5.95378e-06
+Class 7, Probability: 2.66605e-06
+Class 8, Probability: 2.12279e-07
+
+Image 68:
+Class 6, Probability: 0.993663
+Class 8, Probability: 0.00537575
+Class 5, Probability: 0.000958572
+Class 0, Probability: 1.96196e-06
+Class 9, Probability: 2.7158e-07
+
+Image 69:
+Class 6, Probability: 0.999553
+Class 4, Probability: 0.000244932
+Class 2, Probability: 0.000196555
+Class 0, Probability: 2.59598e-06
+Class 5, Probability: 2.11057e-06
+
+Image 70:
+Class 8, Probability: 0.999998
+Class 3, Probability: 1.88792e-06
+Class 2, Probability: 6.63205e-08
+Class 9, Probability: 4.77117e-08
+Class 5, Probability: 8.99983e-09
+
+Image 71:
+Class 4, Probability: 0.999597
+Class 6, Probability: 0.000387977
+Class 0, Probability: 1.404e-05
+Class 2, Probability: 5.83853e-07
+Class 7, Probability: 2.1117e-07
+
+Image 72:
+Class 8, Probability: 0.999999
+Class 2, Probability: 4.77912e-07
+Class 3, Probability: 2.73105e-08
+Class 9, Probability: 1.77357e-09
+Class 0, Probability: 8.19253e-10
+
+Image 73:
+Class 5, Probability: 1
+Class 3, Probability: 1.30827e-07
+Class 9, Probability: 1.39911e-09
+Class 8, Probability: 5.59844e-10
+Class 6, Probability: 2.27984e-10
+
+Image 74:
+Class 4, Probability: 0.999886
+Class 6, Probability: 5.83233e-05
+Class 8, Probability: 5.03887e-05
+Class 9, Probability: 3.17606e-06
+Class 7, Probability: 1.27238e-06
+
+Image 75:
+Class 0, Probability: 0.999837
+Class 6, Probability: 0.000134028
+Class 7, Probability: 1.32472e-05
+Class 9, Probability: 9.76178e-06
+Class 1, Probability: 2.48632e-06
+
+Image 76:
+Class 3, Probability: 0.999996
+Class 5, Probability: 3.0043e-06
+Class 8, Probability: 4.05043e-07
+Class 9, Probability: 9.23718e-08
+Class 2, Probability: 8.20715e-08
+
+Image 77:
+Class 4, Probability: 0.999784
+Class 9, Probability: 0.000197072
+Class 7, Probability: 8.61438e-06
+Class 1, Probability: 7.13535e-06
+Class 5, Probability: 1.06814e-06
+
+Image 78:
+Class 9, Probability: 0.999992
+Class 4, Probability: 7.88201e-06
+Class 3, Probability: 1.07869e-07
+Class 8, Probability: 8.08593e-08
+Class 7, Probability: 6.88125e-08
+
+Image 79:
+Class 5, Probability: 0.999995
+Class 3, Probability: 5.02935e-06
+Class 9, Probability: 1.03337e-07
+Class 8, Probability: 3.25233e-09
+Class 6, Probability: 1.42042e-09
+
+Image 80:
+Class 7, Probability: 0.998772
+Class 9, Probability: 0.00087995
+Class 3, Probability: 0.000305807
+Class 2, Probability: 3.24864e-05
+Class 0, Probability: 4.29394e-06
+
+Image 81:
+Class 0, Probability: 0.99997
+Class 6, Probability: 3.02451e-05
+Class 7, Probability: 1.57137e-07
+Class 2, Probability: 6.85899e-08
+Class 1, Probability: 4.10968e-09
+
+Image 82:
+Class 4, Probability: 0.999999
+Class 8, Probability: 8.62556e-07
+Class 7, Probability: 6.5306e-08
+Class 9, Probability: 6.49424e-08
+Class 1, Probability: 1.7588e-08
+
+Image 83:
+Class 9, Probability: 0.996336
+Class 4, Probability: 0.0035056
+Class 3, Probability: 0.000151093
+Class 5, Probability: 2.73401e-06
+Class 2, Probability: 2.229e-06
+
+Image 84:
+Class 2, Probability: 0.999999
+Class 8, Probability: 3.80808e-07
+Class 3, Probability: 2.47701e-07
+Class 7, Probability: 1.05414e-07
+Class 1, Probability: 8.34597e-09
+
+Image 85:
+Class 1, Probability: 0.999502
+Class 7, Probability: 0.000362012
+Class 4, Probability: 4.41664e-05
+Class 8, Probability: 2.33229e-05
+Class 2, Probability: 2.29924e-05
+
+Image 86:
+Class 0, Probability: 0.999987
+Class 7, Probability: 8.29264e-06
+Class 2, Probability: 4.19977e-06
+Class 9, Probability: 1.56482e-07
+Class 8, Probability: 8.61162e-08
+
+Image 87:
+Class 1, Probability: 0.99998
+Class 4, Probability: 1.13009e-05
+Class 7, Probability: 6.98861e-06
+Class 9, Probability: 9.33468e-07
+Class 8, Probability: 5.90554e-07
+
+Image 88:
+Class 3, Probability: 1
+Class 8, Probability: 3.24881e-08
+Class 9, Probability: 3.19452e-08
+Class 5, Probability: 8.53485e-10
+Class 2, Probability: 9.83352e-11
+
+Image 89:
+Class 7, Probability: 0.999955
+Class 3, Probability: 3.88336e-05
+Class 9, Probability: 5.24884e-06
+Class 2, Probability: 7.64002e-07
+Class 1, Probability: 9.27889e-08
+
+Image 90:
+Class 9, Probability: 0.999896
+Class 3, Probability: 9.20756e-05
+Class 7, Probability: 6.49027e-06
+Class 4, Probability: 4.96726e-06
+Class 5, Probability: 4.45596e-07
+
+Image 91:
+Class 1, Probability: 0.999952
+Class 7, Probability: 4.21171e-05
+Class 4, Probability: 3.2741e-06
+Class 8, Probability: 1.58776e-06
+Class 0, Probability: 8.03977e-07
+
+Image 92:
+Class 1, Probability: 0.999983
+Class 7, Probability: 5.93848e-06
+Class 8, Probability: 4.27187e-06
+Class 2, Probability: 3.69153e-06
+Class 4, Probability: 1.98296e-06
+
+Image 93:
+Class 2, Probability: 0.999819
+Class 7, Probability: 0.000177989
+Class 3, Probability: 2.19122e-06
+Class 1, Probability: 4.57636e-07
+Class 8, Probability: 1.46475e-07
+
+Image 94:
+Class 6, Probability: 1
+Class 0, Probability: 3.80859e-08
+Class 4, Probability: 2.56125e-10
+Class 8, Probability: 3.82312e-11
+Class 5, Probability: 8.85978e-13
+
+Image 95:
+Class 4, Probability: 0.999905
+Class 9, Probability: 9.28118e-05
+Class 8, Probability: 1.45471e-06
+Class 7, Probability: 3.06578e-07
+Class 1, Probability: 1.92753e-07
+
+Image 96:
+Class 8, Probability: 0.999979
+Class 3, Probability: 8.76358e-06
+Class 5, Probability: 8.34528e-06
+Class 9, Probability: 3.22987e-06
+Class 0, Probability: 1.29522e-07
+
+Image 97:
+Class 0, Probability: 0.999978
+Class 7, Probability: 1.56058e-05
+Class 6, Probability: 2.33858e-06
+Class 5, Probability: 1.6706e-06
+Class 9, Probability: 1.02504e-06
+
+Image 98:
+Class 6, Probability: 0.999677
+Class 5, Probability: 0.000102067
+Class 0, Probability: 8.07248e-05
+Class 1, Probability: 7.44187e-05
+Class 4, Probability: 3.88979e-05
+
+Image 99:
+Class 9, Probability: 0.999994
+Class 4, Probability: 5.55501e-06
+Class 8, Probability: 3.96412e-07
+Class 3, Probability: 1.36189e-07
+Class 7, Probability: 4.46831e-08
+
+Image 100:
+Class 1, Probability: 0.999949
+Class 2, Probability: 3.30219e-05
+Class 7, Probability: 9.24081e-06
+Class 8, Probability: 4.62416e-06
+Class 4, Probability: 3.08635e-06
+
