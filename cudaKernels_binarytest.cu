@@ -387,20 +387,10 @@ int main() {
     string fileExtension = ".txt";
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
-    // if (!fileReadP("trained_weights/conv1.txt", weights.conv1, 520)) {
-    //     // Handle error
-    //     return -1;}
     weights.conv1 = fileReadP("weights/conv1.txt", 520);
     weights.conv2 = fileReadP("weights/conv2.txt", 25050);
     weights.fc1 = fileReadP("weights/fc1.txt", 400500);
     weights.fc2 = fileReadP("weights/fc2.txt", 5010);
-    // if (!fileReadP("trained_weights/fc2.txt", weights.fc2, 5010)) {
-    //     // Handle error
-    //     return -1;}
-        //printArray(weights.conv1, 520);
-        //printArray(weights.fc1, 400500);
-        //printArray(weights.conv2, 25050);
-    //printArray(weights.fc2, 5010);
     float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
     CHECK_CUDA_ERROR(cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice));
@@ -472,14 +462,6 @@ int main() {
                     std::cerr << "Error during conv_cuda_1 execution: " << cudaGetErrorString(error) << std::endl;
                 }
         //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
-                // float* test_output = new float[24*24*20];
-                // cudaMemcpy(test_output, c1_output, 24*24*20 * sizeof(float), cudaMemcpyDeviceToHost);
-
-                // //cout << weights.conv1.data() << " ";
-                // //printArray(test_output, 24*24*20 );
-                // float* test2 = new float[12*12*20];
-                // maxPooling(test_output, test2 , 20, 24, 2, 2);
-                dim3 p1_block(16, 16, 1); 
                 dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,
                         (12 + p1_block.y - 1) / p1_block.y,
                         20);
@@ -491,14 +473,6 @@ int main() {
                     std::cerr << "Error during Max_pool_1 execution: " << cudaGetErrorString(error1) << std::endl;
                 }
         //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
-                //printArray(test2,12*12*20 );
-                // float* test3 = new float[8*8*50];
-                // float* test_output = new float[12*12*20];
-                // cudaMemcpy(test_output, p1_output, 12*12*20 * sizeof(float), cudaMemcpyDeviceToHost);
-                // conv(test_output,  weights.conv2, test3, 20, 50, 12, 5);
-                //printArray(test3, 8*8*50);
-
-
                 dim3 c2_block(8, 8); 
                 dim3 c2_grid((8 + c2_block.x - 1) / c2_block.x,
                         (8 + c2_block.y - 1) / c2_block.y,
@@ -520,13 +494,6 @@ int main() {
                 if (error3 != cudaSuccess) {
                     std::cerr << "Error during Max_pool_2 execution: " << cudaGetErrorString(error3) << std::endl;
                 }
-                // float* test4 = new float[4*4*50];
-                // float* test_output = new float[8*8*50];
-                // cudaMemcpy(test_output, c2_output, 8*8*50 * sizeof(float), cudaMemcpyDeviceToHost);
-                // maxPooling(test_output, test4 , 50, 8, 2, 2);
-                //printArray(test4, 4*4*50);
-
-
             //--------------------------------------------FC_1,4,1,50,500,4,1,0,1,400000,500,400500-------------------------------------//
                 int f1_block = 256;
                 int f1_grid = (500 + f1_block - 1) / f1_block;
@@ -537,14 +504,6 @@ int main() {
                 if (error4 != cudaSuccess) {
                     std::cerr << "Error during fully_conv_cuda_1 execution: " << cudaGetErrorString(error4) << std::endl;
                 }
-                // float* test5 = new float[500];
-                // float* test_output = new float[4*4*50];
-                // cudaMemcpy(test_output, p2_output, 4*4*50 * sizeof(float), cudaMemcpyDeviceToHost);
-                // fconv(test_output, weights.fc1, test5, 50, 500, 4);
-                //printArray(test5, 500);
-                // relu(test5, 500);
-                // float* test6 = new float[10];
-                // fconv(test5, weights.fc2, test6, 500, 10, 1);
             //----------------------------------------FC_2,1,1,500,10,1,1,0,0,5000,10,5010-----------------------------------------------------//
               
                 dim3 threads(32);
@@ -554,9 +513,6 @@ int main() {
                 if (error5 != cudaSuccess) {
                     std::cerr << "Error during fully_conv_cuda_2 execution: " << cudaGetErrorString(error5) << std::endl;
                 }
-
-
-
             //-------------------------------------------SOFTMAX PROBABILITIES---------------------------------------------------------------------------//
                 float* test6 = new float[10];
                 CHECK_CUDA_ERROR(cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost));

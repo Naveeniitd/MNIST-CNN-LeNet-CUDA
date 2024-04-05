@@ -432,13 +432,13 @@ int main() {
             CHECK_CUDA_ERROR(cudaMalloc(&f2_output, 10 * 100*sizeof(float)));
             if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
                 std::string filepath = directory + filename;
-                cout << filepath  << endl;
+                //cout << filepath  << endl;
                 float* input = new float[28*28*100];
                 loadImagesFromBin(filepath, input, 100, 28);
                 //printArray(input, 28*28);
                 CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice));
                 std::string savePath = saveDirectory + filename.substr(0, filename.length() - 4) + "_top5" + fileExtension;
-                cout  <<  savePath << endl;
+                //cout  <<  savePath << endl;
                 std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
                 if (!outFile.is_open()) {
                     std::cerr << "Failed to open the file for writing." << std::endl;
