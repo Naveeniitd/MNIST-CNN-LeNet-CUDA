@@ -354,12 +354,12 @@ int main(int argc, char* argv[]){
             saveArrayToFile(output, res*res*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }
     }
-    else if (strcmp(argv[4], "Softmax") == 0 ||strcmp(argv[4], "Sigmoid") == 0  ) {
+    else if (strcmp(argv[4], "soft") == 0 ||strcmp(argv[4], "sig") == 0  ) {
         if (argc < 5) {
         std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function]" << std::endl;
         return 1;
         }
-        if(strcmp(argv[4], "Softmax") == 0 ){
+        if(strcmp(argv[4], "soft") == 0 ){
         softmax(input, isize*isize*in_channel);
         saveArrayToFile(input, isize*isize*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }

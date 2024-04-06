@@ -28,7 +28,7 @@ python batch_preprocess.py
 python preprocess.py
 ```
 
-# Subtask 1: Running C++ Functions
+# Subtask 1/2: Running C++ Functions/ Cuda Kernels
 
 This C++ library provides a set of functions for preprocessing and analyzing MNIST digit images. It includes convolution operations (with and without padding), non-linear activation functions (ReLU, tanh), subsampling (max pooling, average pooling), and transformation of float vectors to probability vectors using softmax and sigmoid functions. The library is designed to support flexible command-line arguments for easy integration into broader machine learning or image processing pipelines.
 
@@ -61,7 +61,7 @@ The `s1`/`s2` executable supports various command-line arguments to specify the 
 - `[path_to_bin_file]`: Path to the binary file containing the image data.
 - `[Image Size]`: Size of the image (e.g., 28 for MNIST).
 - `[in_channel]`: Number of input channels (e.g., 1 for grayscale images).
-- `[Function]`: The function to apply. Options include `MaxPooling`, `AvgPooling`, `Softmax`, `Sigmoid`, `relu`, and `tanh`.
+- `[Function]`: The function to apply. Options include `max`, `avg`, `soft`, `sig`, `relu`, and `tanh`.
 - `[additional parameters]`: Depends on the function chosen. For pooling operations, specify `[ksize] [stride]`.
 
 ### Examples
