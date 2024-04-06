@@ -221,6 +221,7 @@ bool imgload(const string& path, float* input){
 int main() {
     string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/output_single/";
     string fileExtension = ".txt";
+    float correct_output = 0;
     //---------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
     weights.conv1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 520);
@@ -247,13 +248,16 @@ int main() {
     if ((dir = opendir(directory.c_str())) != nullptr) {
         while ((ent = readdir(dir)) != nullptr) {
             std::string filename = ent->d_name;
-
+            
             // Check if the file is a .bin file
             if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
+                string num = filename.substr(filename.length()-5, 1);
+
+                //cout << num << endl;
                 std::string filepath = directory + filename;
                 float* input = new float[28 * 28];
                 std::ifstream file(filepath, std::ios::binary);
-                std::cout << "Trying to open: " << filepath << std::endl;
+                //std::cout << "Trying to open: " << filepath << std::endl;
 
                 if (!file) {
                     std::cerr << "Cannot open file!" << std::endl;
@@ -282,46 +286,36 @@ int main() {
                 CHECK_CUDA_ERROR(cudaMalloc(&relu_output, 500*sizeof(float))); 
                 CHECK_CUDA_ERROR(cudaMalloc(&f2_output, 10 * sizeof(float)));
                 
-            //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
+                //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//
                 
-            //--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
+                //--------------------------------conv1-28,24,1,20,5,1,0,0,500,20,520--------------------------------------------------------//
                 dim3 c1_block(16, 16, 1); 
-                dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,
-                        (24 + c1_block.y - 1) / c1_block.y,
-                        20);
-
+                dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,(24 + c1_block.y - 1) / c1_block.y,20);
                 conv_cuda<<<c1_grid, c1_block>>>(c1_input, d_conv1, c1_output, 1, 20, 28, 5);
                 cudaDeviceSynchronize(); // Wait for the kernel to complete
                 cudaError_t error = cudaGetLastError();
                 if (error != cudaSuccess) {
                     std::cerr << "Error during conv_cuda_1 execution: " << cudaGetErrorString(error) << std::endl;
                 }
-        //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
+                //-----------------------------------Pool_1,24,12,20,20,2,2,0,0,-,-,--------------------------------------------------------------//
                 dim3 p1_block(16, 16, 1); 
-                dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,
-                        (12 + p1_block.y - 1) / p1_block.y,
-                        20);
-
+                dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,(12 + p1_block.y - 1) / p1_block.y,20);
                 maxPooling<<<p1_grid, p1_block>>>(c1_output, p1_output, 20, 24, 2, 2);
                 cudaDeviceSynchronize();
                 cudaError_t error1 = cudaGetLastError();
                 if (error1 != cudaSuccess) {
                     std::cerr << "Error during Max_pool_1 execution: " << cudaGetErrorString(error1) << std::endl;
                 }
-        //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
+                //------------------------------------Conv_2,12,8,20,50,5,1,0,0,25000,50,25050--------------------------------------------------------//
                 dim3 c2_block(8, 8); 
-                dim3 c2_grid((8 + c2_block.x - 1) / c2_block.x,
-                        (8 + c2_block.y - 1) / c2_block.y,
-                        50); 
-
+                dim3 c2_grid((8 + c2_block.x - 1) / c2_block.x,(8 + c2_block.y - 1) / c2_block.y,50); 
                 conv_cuda<<<c2_grid, c2_block>>>(p1_output, d_conv2, c2_output, 20, 50, 12, 5);
                 cudaDeviceSynchronize();
                 cudaError_t error2 = cudaGetLastError();
                 if (error2 != cudaSuccess) {
                     std::cerr << "Error during conv_cuda_2 execution: " << cudaGetErrorString(error2) << std::endl;
                 }
-            //------------------------------------------Pool_2,8,4,50,50,2,2,0,0,-,-,-----------------------------------------------//
-                
+                //------------------------------------------Pool_2,8,4,50,50,2,2,0,0,-,-,-----------------------------------------------//
                 dim3 p2_block(4, 4);
                 dim3 p2_grid(1, 1, 50);
                 maxPooling<<<p2_grid, p2_block>>>(c2_output, p2_output, 50, 8, 2, 2);
@@ -330,7 +324,7 @@ int main() {
                 if (error3 != cudaSuccess) {
                     std::cerr << "Error during Max_pool_2 execution: " << cudaGetErrorString(error3) << std::endl;
                 }
-            //--------------------------------------------FC_1,4,1,50,500,4,1,0,1,400000,500,400500-------------------------------------//
+                //--------------------------------------------FC_1,4,1,50,500,4,1,0,1,400000,500,400500-------------------------------------//
                 int f1_block = 256;
                 int f1_grid = (500 + f1_block - 1) / f1_block;
                 dim3 threads1(f1_block);
@@ -340,8 +334,7 @@ int main() {
                 if (error4 != cudaSuccess) {
                     std::cerr << "Error during fully_conv_cuda_1 execution: " << cudaGetErrorString(error4) << std::endl;
                 }
-            //----------------------------------------FC_2,1,1,500,10,1,1,0,0,5000,10,5010-----------------------------------------------------//
-              
+                //----------------------------------------FC_2,1,1,500,10,1,1,0,0,5000,10,5010-----------------------------------------------------// 
                 dim3 threads(32);
                 dim3 blocks(1);
                 fconv_cuda<<<blocks, threads>>>(f1_output, d_fc2, f2_output, 500, 10, 1);
@@ -349,7 +342,7 @@ int main() {
                 if (error5 != cudaSuccess) {
                     std::cerr << "Error during fully_conv_cuda_2 execution: " << cudaGetErrorString(error5) << std::endl;
                 }
-            //-------------------------------------------SOFTMAX PROBABILITIES---------------------------------------------------------------------------//
+                //-------------------------------------------SOFTMAX PROBABILITIES---------------------------------------------------------------------------//
                 float* test6 = new float[10];
                 CHECK_CUDA_ERROR(cudaMemcpy(test6, f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost));
                 softmax(test6, 10);     
@@ -359,14 +352,19 @@ int main() {
                 string savePath = saveDirectory + filename.substr(0, filename.length() - 4) + "_top5" + fileExtension; // Assuming filename has '.bin' extension
                 // Open a file stream to write
                 std::ofstream outFile(savePath);
+                //cout << savePath << endl;
                 if (!outFile.is_open()) {
                     std::cerr << "Failed to open file for writing: " << savePath << std::endl;
                     return -1; // or handle the error based on your application's needs
                 }
-
+                //cout << filename.substr(10,11) << endl;
+                if(top_classes[0]==stoi(num)){
+                    correct_output++;
+                }
                 // Write top 5 probabilities and their classes to the file
                 for (size_t i = 0; i < top_classes.size(); ++i) {
                     outFile << "Class " << top_classes[i] << " Probability: " << top_probs[i] << std::endl;
+                    
                 }
                 outFile.close();
                 delete[] test6;
@@ -380,15 +378,20 @@ int main() {
                 CHECK_CUDA_ERROR(cudaFree(relu_output));
                 CHECK_CUDA_ERROR(cudaFree(f2_output));
             }
+            
         }
         closedir(dir);
     } else {
         // Could not open directory
         std::cerr << "Could not open directory" << std::endl;
         return EXIT_FAILURE;
-    }   
+    }  
+
+    cout << "Accuracy of result is " << (correct_output/10000)*100 << endl;
     delete[] weights.conv2;
     delete[] weights.fc1;
+    delete[] weights.fc2;
+    delete[] weights.conv1;
     CHECK_CUDA_ERROR(cudaFree(d_conv1));
     CHECK_CUDA_ERROR(cudaFree(d_conv2)); 
     CHECK_CUDA_ERROR(cudaFree(d_fc1)); 
