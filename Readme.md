@@ -2,7 +2,6 @@
 
 This project implements an image processing library in C++ and CUDA aimed at recognizing hand-written digits from the MNIST dataset. It includes a series of subtasks from basic image processing functions to the implementation of a Convolutional Neural Network (CNN) using the LeNet-5 architecture, followed by optimization using CUDA streams.
 
-
 # Data Preprocessing
 
 Before running the main components of the project, it's essential to preprocess your dataset. This project includes two Python scripts (batch_preprocess.py && preprocess.py) for converting images from the MNIST dataset into a binary format suitable for further processing.
@@ -85,3 +84,6 @@ This command applies max pooling to the image in `sample.bin` with a kernel size
 - **ReLU and Tanh**: Applies the ReLU or tanh activation function to an input matrix.
 - **Max Pooling and Average Pooling**: Subsamples an input matrix using the max or average pooling method.
 - **Softmax and Sigmoid**: Converts a vector of floats to a vector of probabilities using the softmax or sigmoid function.
+
+
+

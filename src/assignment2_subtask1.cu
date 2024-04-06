@@ -39,6 +39,22 @@ void printVector(const vector<float>& vec) {
     }
     std::cout << "]" << std::endl;
 }
+void saveArrayToFile(const float* array, int size, const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for writing: " << filename << std::endl;
+        return;
+    }
+
+    for (int i = 0; i < size; ++i) {
+        file << array[i];
+        if (i < size - 1) {
+            file << std::endl; // or use 'file << " ";' for space-separated values
+        }
+    }
+
+    file.close();
+}
 //------------------------------------SOFTMAX Function---------------------------------------------------------//
 void softmax(float* arr, int size) {
     float sum = 0.0;
@@ -319,7 +335,7 @@ int main(int argc, char* argv[]){
     file.close();
 
 
-    if (strcmp(argv[4], "MaxPooling") == 0 ||strcmp(argv[4], "AvgPooling") == 0  ) {
+    if (strcmp(argv[4], "max") == 0 ||strcmp(argv[4], "avg") == 0  ) {
         if (argc < 7) {
         std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function] [ksize] [stride]" << std::endl;
         return 1;
@@ -330,12 +346,12 @@ int main(int argc, char* argv[]){
         int stride = stoi(argv[6]);
         int res = (isize - ksize) / stride + 1;
         float* output = new float[res*res*in_channel];
-        if(strcmp(argv[4], "MaxPooling") == 0 ){
+        if(strcmp(argv[4], "max") == 0 ){
         maxPooling(input, output, in_channel, isize, ksize, stride);
-        printArray(output,res*res*in_channel);}
+        saveArrayToFile(output, res*res*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");}
         else{
             avgPooing(input, output, in_channel, isize, ksize, stride);
-            printArray(output,res*res*in_channel);
+            saveArrayToFile(output, res*res*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }
     }
     else if (strcmp(argv[4], "Softmax") == 0 ||strcmp(argv[4], "Sigmoid") == 0  ) {
@@ -345,11 +361,11 @@ int main(int argc, char* argv[]){
         }
         if(strcmp(argv[4], "Softmax") == 0 ){
         softmax(input, isize*isize*in_channel);
-        printArray(input,isize*isize*in_channel);
+        saveArrayToFile(input, isize*isize*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }
         else{
             sigmoid(input, in_channel*isize*isize);
-            printArray(input, in_channel*isize*isize);
+            saveArrayToFile(input, isize*isize*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }
     }
     else if (strcmp(argv[4], "relu") == 0 ||strcmp(argv[4], "tanh") == 0  ) {
@@ -359,11 +375,12 @@ int main(int argc, char* argv[]){
         }
         if(strcmp(argv[4], "relu") == 0 ){
         relu(input, isize*isize*in_channel);
-        printArray(input,isize*isize*in_channel);
+        saveArrayToFile(input, isize*isize*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
+        //printArray(input,isize*isize*in_channel);
         }
         else{
             tanh_activation(input, in_channel*isize*isize);
-            printArray(input, in_channel*isize*isize);
+            saveArrayToFile(input, isize*isize*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_cpu.txt");
         }
     }
     

@@ -25,7 +25,22 @@ struct Weights {
     float* conv1;
     float* fc2; 
 };
+void saveArrayToFile(const float* array, int size, const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for writing: " << filename << std::endl;
+        return;
+    }
 
+    for (int i = 0; i < size; ++i) {
+        file << array[i];
+        if (i < size - 1) {
+            file << std::endl; // or use 'file << " ";' for space-separated values
+        }
+    }
+
+    file.close();
+}
 void printArray(float* array, int n) {
     std::cout << "[";
     for (int i = 0; i < n; ++i) {
@@ -63,10 +78,10 @@ __global__ void conv_cuda(const float* input, const float* weights, float* outpu
     }
 }
 //-------------------------------------Relu------------------------------------------------------------------------------//
-__global__ void relu(float* input, float* output, int n) {
+__global__ void relu(float* input, int n) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < n) {
-        output[i] = max(0.0f, input[i]);
+        input[i] = max(0.0f, input[i]);
     }
 }
 //---------------------------------------Tanh----------------------------------------------------------------------------//
@@ -178,6 +193,24 @@ __global__ void fconv_cuda(const float* input, const float* weights, float* outp
         output[index] = sum + bias; // Using max for ReLU
     }
 }
+//--------------------------Function-to-read-trained-weights---------------------------//
+float* fileRead(const string& path, int size) {
+    ifstream file(path);
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << path << endl;
+        return nullptr;
+    }
+    float* weights = new float[size];
+    for (int i = 0; i < size; i++) {
+        if (!(file >> weights[i])) {
+            cerr << "Failed to read weight at position " << i << " from file: " << path << endl;
+            delete[] weights; 
+            return nullptr;
+        }
+    }
+    file.close();
+    return weights;
+}
 int main(int argc, char* argv[]){
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function] [different parameter for different function]" << std::endl;
@@ -185,9 +218,9 @@ int main(int argc, char* argv[]){
     }
     Weights weights;
     weights.conv1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 520);
-    weights.conv2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 25050);
-    weights.fc1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 400500);
-    weights.fc2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 5010);
+    weights.conv2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv2.txt", 25050);
+    weights.fc1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc1.txt", 400500);
+    weights.fc2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc2.txt", 5010);
     float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
     CHECK_CUDA_ERROR(cudaMemcpy(d_conv1, weights.conv1, 520 * sizeof(float), cudaMemcpyHostToDevice));
@@ -200,6 +233,7 @@ int main(int argc, char* argv[]){
     //printArray(weights.conv1, 520);
     int isize = stoi(argv[2]);
     int in_channel = stoi(argv[3]);
+    
     float* input = new float[isize * isize*in_channel];
     std::ifstream file(argv[1], std::ios::binary);
     
@@ -209,7 +243,7 @@ int main(int argc, char* argv[]){
     }
    
     // Read the entire image data into the array
-    file.read(reinterpret_cast<char*>(input), isize*isize*in_channel *sizeof(float));
+    file.read(reinterpret_cast<char*>(input), isize*isize*in_channel*sizeof(float));
     if (!file) {
         std::cerr << "Error reading file or file too short!" << std::endl;
         return 2;
@@ -218,7 +252,13 @@ int main(int argc, char* argv[]){
     file.close();
 
 
-    if (strcmp(argv[4], "MaxPooling") == 0 ||strcmp(argv[4], "AvgPooling") == 0  ) {
+    float* k_input;
+    CHECK_CUDA_ERROR(cudaMalloc(&k_input, isize*isize*in_channel* sizeof(float))); 
+    CHECK_CUDA_ERROR(cudaMemcpy(k_input, input,isize*isize*in_channel*sizeof(float), cudaMemcpyHostToDevice));
+
+    
+
+    if (strcmp(argv[4], "max") == 0 ||strcmp(argv[4], "avg") == 0  ) {
         if (argc < 7) {
         std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function] [ksize] [stride]" << std::endl;
         return 1;
@@ -226,91 +266,81 @@ int main(int argc, char* argv[]){
         int ksize = stoi(argv[5]); 
         int stride = stoi(argv[6]);
         int res = (isize - ksize) / stride + 1;
-    
         float* output = new float[res*res*in_channel];
-        if(strcmp(argv[4], "MaxPooling") == 0 ){
-            dim3 p1_block(16, 16, 1); 
-            dim3 p1_grid((res + p1_block.x - 1) / p1_block.x, (res + p1_block.y - 1) / p1_block.y, in_channel);
-            maxpool_cuda<<<p1_grid, p1_block>>>(curr_c1_output, curr_p1_output, in_channel, isize, ksize, stride);      
+        float* m_output;
+        CHECK_CUDA_ERROR(cudaMalloc(&m_output, res*res*in_channel*sizeof(float)));
+
+        dim3 p1_block(16, 16, 1); 
+        dim3 p1_grid((res + p1_block.x - 1) / p1_block.x,(res + p1_block.y - 1) / p1_block.y,in_channel);
+        if(strcmp(argv[4], "max") == 0 ){ 
+            maxpool_cuda<<<p1_grid, p1_block>>>(k_input, m_output, in_channel, isize, ksize, stride);
+            cudaDeviceSynchronize();
             cudaError_t error1 = cudaGetLastError();
             if (error1 != cudaSuccess) {
-                std::cerr << "Error during Max_pool_1 execution: " << cudaGetErrorString(error1) << std::endl;
+                std::cerr << "Error during max_pool execution: " << cudaGetErrorString(error1) << std::endl;
             }
+            CHECK_CUDA_ERROR(cudaMemcpy(output, m_output, res*res*in_channel * sizeof(float), cudaMemcpyDeviceToHost));
+            saveArrayToFile(output, res*res*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_gpu.txt");
         }
         else{
-            avgPooing(input, output, in_channel, isize, ksize, stride);
-            printArray(output,res*res*in_channel);
+            avgpool_cuda<<<p1_grid, p1_block>>>(k_input, m_output, in_channel, isize, ksize, stride);
+            cudaDeviceSynchronize();
+            cudaError_t error1 = cudaGetLastError();
+            if (error1 != cudaSuccess) {
+                std::cerr << "Error during avg_pool execution: " << cudaGetErrorString(error1) << std::endl;
+            }
+            CHECK_CUDA_ERROR(cudaMemcpy(output, m_output, res*res*in_channel * sizeof(float), cudaMemcpyDeviceToHost));
+            saveArrayToFile(output, res*res*in_channel, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_gpu.txt");
         }
+        delete[] output;
+        CHECK_CUDA_ERROR(cudaFree(m_output));
     }
-    else if (strcmp(argv[4], "Softmax") == 0 ||strcmp(argv[4], "Sigmoid") == 0  ) {
-        if (argc < 5) {
-        std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function]" << std::endl;
-        return 1;
-        }
-        if(strcmp(argv[4], "Softmax") == 0 ){
-        softmax(input, isize*isize*in_channel);
-        printArray(input,isize*isize*in_channel);
-        }
-        else{
-            sigmoid(input, in_channel*isize*isize);
-            printArray(input, in_channel*isize*isize);
-        }
-    }
+    
     else if (strcmp(argv[4], "relu") == 0 ||strcmp(argv[4], "tanh") == 0  ) {
         if (argc < 5) {
         std::cerr << "Usage: " << argv[0] << " [path_to_bin_file] [Image Size] [in_channel] [Function]" << std::endl;
         return 1;
         }
+        int res = isize*isize*in_channel;
+        int r_block = 1024;
+        int r_grid = ( res+ r_block - 1) / r_block;
+        
+        float* output = new float[res];
+        
         if(strcmp(argv[4], "relu") == 0 ){
-        relu(input, isize*isize*in_channel);
-        printArray(input,isize*isize*in_channel);
+            
+            relu<<<r_grid, r_block>>>(k_input, res);  
+            cudaError_t error1 = cudaGetLastError();
+                if (error1 != cudaSuccess) {
+                    std::cerr << "Error during relu execution: " << cudaGetErrorString(error1) << std::endl;
+                } 
+            
+            
+            CHECK_CUDA_ERROR(cudaMemcpy(output, k_input, res * sizeof(float), cudaMemcpyDeviceToHost));
+            saveArrayToFile(output, res, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_gpu.txt");
         }
         else{
-            tanh_activation(input, in_channel*isize*isize);
-            printArray(input, in_channel*isize*isize);
+            
+            tanh<<<r_grid, r_block>>>(k_input, res);  
+            cudaError_t error1 = cudaGetLastError();
+                if (error1 != cudaSuccess) {
+                    std::cerr << "Error during tanh execution: " << cudaGetErrorString(error1) << std::endl;
+                } 
+            
+            CHECK_CUDA_ERROR(cudaMemcpy(output, k_input, res * sizeof(float), cudaMemcpyDeviceToHost));
+            saveArrayToFile(output, res, "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/out_gpu.txt");
         }
+         delete[] output;
+         
     }
     
-    // //printArray(input, 28*28);
-    // float* test_output = new float[24*24*20];
-    // conv(input, weights.conv1, test_output, 1, 20, 28, 5);
-    // //cout << weights.conv1.data() << " ";
-    // printArray(test_output, 24*24*20 );
-    // float* test2 = new float[12*12*20];
-    // MaxPooling(test_output, test2 , 20, 24, 2, 2);
-    // //printArray(test2,12*12*20 );
-    // float* test3 = new float[8*8*50];
-    // conv(test2,  weights.conv2, test3, 20, 50, 12, 5);
-    // //printArray(test3, 8*8*50);
-    // float* test4 = new float[4*4*50];
-    // MaxPooling(test3, test4 , 50, 8, 2, 2);
-    // //printArray(test4, 4*4*50);
-    // float* test5 = new float[500];
-    // fconvR(test4, weights.fc1, test5, 50, 500, 4);
-    // //printArray(test5, 500);
-    // float* test6 = new float[10];
-    // fconv(test5, weights.fc2, test6, 500, 10, 1);
-    // // printArray(test6, 10);
-    // softmax(test6, 10);
-    // printArray(test6, 10);
-    // vector<int> topc;
-    // vector<float> topprob;
-    // findTop5(test6, 10, topc, topprob);
-    // // Print top 5 probabilities and their classes
-    // for (size_t i = 0; i < topc.size(); ++i) {
-    //     std::cout << "Class " << topc[i] << " Probability: " << topprob[i] << std::endl;
-    // }
-    // delete[] weights.conv1;
-    // delete[] weights.conv2;
-    // delete[] weights.fc1;
-    // delete[] weights.fc2;
-    // delete[] test_output;
-    // delete[] test2;
-    // delete[] test3;
-    // delete[] test4;
-    // delete[] test5;
-    // delete[] test6;
     delete[] input;
+   
+    CHECK_CUDA_ERROR(cudaFree(d_conv1));
+    CHECK_CUDA_ERROR(cudaFree(d_conv2));
+    CHECK_CUDA_ERROR(cudaFree(d_fc1));
+    CHECK_CUDA_ERROR(cudaFree(d_fc2));
+    
 
     return 0;
 
