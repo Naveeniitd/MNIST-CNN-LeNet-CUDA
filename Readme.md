@@ -30,7 +30,7 @@ python preprocess.py
 
 # Subtask 1/2: Running C++ Functions/ Cuda Kernels
 
-This C++ library provides a set of functions for preprocessing and analyzing MNIST digit images. It includes convolution operations (with and without padding), non-linear activation functions (ReLU, tanh), subsampling (max pooling, average pooling), and transformation of float vectors to probability vectors using softmax and sigmoid functions. The library is designed to support flexible command-line arguments for easy integration into broader machine learning or image processing pipelines.
+This comprehensive C++ and CUDA library is designed for efficient image processing and recognition of handwritten digits from the MNIST dataset. By leveraging the parallel computing power of NVIDIA GPUs, it offers high-performance implementations of critical operations involved in deep learning models, particularly those used in Convolutional Neural Networks (CNNs).
 
 ## Getting Started
 
