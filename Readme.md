@@ -82,4 +82,22 @@ This command applies max pooling to the image in `2.bin` with a kernel size of 2
 - **Softmax and Sigmoid**: Converts a vector of floats to a vector of probabilities using the softmax or sigmoid function.
 
 
+## Verifying CUDA and C++ Outputs
+
+To ensure the CUDA kernels' outputs match those from C++ functions, use the `check_matrix.py` Python script. This script compares output files line-by-line to check for consistency.
+
+### Steps:
+
+1. **Generate Outputs**: Run both your CUDA and C++ implementations to generate output files.
+
+2. **Run Comparison Script**: 
+
+    ```bash
+    python chech_matrix.py
+    ```
+
+3. **Review Results**: The script will indicate whether the files are "the same" or "different."
+
+
+
 
