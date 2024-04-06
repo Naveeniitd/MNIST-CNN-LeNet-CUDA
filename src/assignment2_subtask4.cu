@@ -495,7 +495,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
 
 //------------------------------------MAIN FUNCTION-------------------------------------------------//
 int main() {
-
+    int correct_output = 0;
     const int num_streams = 16;
     std::vector<cudaStream_t> streams(num_streams);
      
@@ -505,14 +505,14 @@ int main() {
     std::vector<std::string> filepaths;
     const int batch_size = 100;
     const int isize = 28 * 28;
-    string saveDirectory = "cuda_output_batch/";
+    string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/stream_output_batch/";
     string fileExtension = ".txt";
     //-----------------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
-    weights.conv1 = fileReadP("weights/conv1.txt", 520);
-    weights.conv2 = fileReadP("weights/conv2.txt", 25050);
-    weights.fc1 = fileReadP("weights/fc1.txt", 400500);
-    weights.fc2 = fileReadP("weights/fc2.txt", 5010);
+    weights.conv1 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 520);
+    weights.conv2 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv2.txt", 25050);
+    weights.fc1 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc1.txt", 400500);
+    weights.fc2 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc2.txt", 5010);
     //printArray(weights.conv1, 520);
     float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
@@ -525,7 +525,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice));
              
     
-    std::string directory = "batch_binary/";
+    std::string directory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/batch_binary/";
     DIR* dir;
     struct dirent* ent;
     cudaEvent_t start, stop;
@@ -536,7 +536,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaEventRecord(start));
 
      
-   
+    
     if ((dir = opendir(directory.c_str())) != nullptr) {    
    
         while ((ent = readdir(dir)) != nullptr) {
@@ -545,6 +545,8 @@ int main() {
             std::string filename = ent->d_name;
             if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
                 std::string filepath = directory + filename;
+                cout << filepath  << endl;
+                string labelpath = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/labels_batch_binary/" + filename.substr(0, 7) + "_labels.txt";
                 filepaths.push_back(filepath);
                 //cout << filepath  << endl;        
             }       
@@ -575,9 +577,9 @@ int main() {
         CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice));
 
 
-
-        std::string savePath = saveDirectory + filepaths[i].substr(13, filepaths[i].length() - 4) + "_top5" + fileExtension;
-        //cout  <<  savePath << endl;
+        cout << filepaths[i] << endl;
+        std::string savePath = saveDirectory + filepaths[i].substr(filepaths[i].length() - 12, 8) + "_top5" + fileExtension;
+        cout  <<  savePath << endl;
         std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
         if (!outFile.is_open()) {
             std::cerr << "Failed to open the file for writing." << std::endl;
