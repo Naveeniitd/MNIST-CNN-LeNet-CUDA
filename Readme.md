@@ -100,4 +100,46 @@ To ensure the CUDA kernels' outputs match those from C++ functions, use the `che
 
 
 
+# Subtask3 : LeNet-5 CNN Implementation
 
+This section of our library leverages the power of NVIDIA CUDA to perform high-speed image processing and digit recognition on the MNIST dataset. Following the LeNet-5 architecture, it incorporates convolutional layers, activation functions (ReLU, Tanh), pooling layers (Max and Average), and a fully connected layer, concluding with a softmax probability distribution for digit classification.
+
+## Running the Digit Recognition Process
+
+Before executing the recognition process, ensure your environment is set up with the necessary CUDA toolkit and that your NVIDIA GPU driver is correctly installed. Additionally, ensure the MNIST dataset is preprocessed into binary format as expected by the program.
+
+1. **Compilation**: To compile the program, navigate to the source directory and use the `nvcc` compiler:
+    ```bash
+    nvcc -std=c++11 -o s3 assignment2_subtask3.cu
+    ```
+
+2. **Execution**: Run the compiled executable with the following command:
+    ```bash
+    ./s3
+    ```
+    The program automatically processes the MNIST images located in the predefined directory and outputs the recognition results.
+
+### Directory Structure
+
+- **Weights Directory**: Contains pre-trained weights for the LeNet-5 model layers. Ensure the paths in the source code match the location of these files on your system.
+- **Output Directory**: The program saves the top 5 softmax probabilities for each processed MNIST image here, along with the predicted class labels.
+
+### Output Interpretation
+
+For each image processed, the program generates a file containing the top 5 predictions in descending order of probability. Each line in the output file corresponds to a class (digit) and its associated probability, formatted as follows:
+```
+Class 2 Probability: 0.999
+Class 1 Probability: 0.0005
+...
+```
+### Performance Metrics
+
+The program calculates and displays the overall accuracy of the recognition process, comparing the top prediction for each image against the true labels. Additionally, it reports the total processing time, allowing for performance assessments. Labels are given on the name of the image such that : `000017-num7.png` with `7` as Label.
+
+### Accuracy and Time Measurement
+
+Upon completion, the program prints the accuracy percentage and total elapsed time (in milliseconds) to the console:
+```
+Accuracy of result is 99.15%
+Time taken: 12345 ms
+```
