@@ -50,16 +50,17 @@ To compile the code, navigate to the project directory and use the following com
 ```bash
 module load compiler/cuda/10.2/compilervars
 nvcc -std=c++11 assignment2_subtask1.cu -o s1
+nvcc -std=c++11 assignment2_subtask2.cu -o s2
 ```
 
-This command compiles the source code into an executable named `s1`.
+This command compiles the source code into an executable named `s1`/`s2`.
 
 ## Usage
 
-The `s1` executable supports various command-line arguments to specify the operation to perform and its parameters. Here's how to use it:
+The `s1`/`s2` executable supports various command-line arguments to specify the operation to perform and its parameters. Here's how to use it:
 
 ```bash
-./mnist_processor [path_to_bin_file] [Image Size] [in_channel] [Function] [additional parameters]
+./s1 [path_to_bin_file] [Image Size] [in_channel] [Function] [additional parameters]
 ```
 
 - `[path_to_bin_file]`: Path to the binary file containing the image data.
@@ -73,10 +74,10 @@ The `s1` executable supports various command-line arguments to specify the opera
 #### Max Pooling
 
 ```bash
-./mnist_processor ./data/sample.bin 28 1 MaxPooling 2 2
+./s1 ./data/2.bin 28 1 MaxPooling 2 2
 ```
 
-This command applies max pooling to the image in `sample.bin` with a kernel size of 2 and a stride of 2.
+This command applies max pooling to the image in `2.bin` with a kernel size of 2 and a stride of 2.
 
 ## Functions Implemented
 
