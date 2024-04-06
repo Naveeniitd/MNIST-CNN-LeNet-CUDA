@@ -100,9 +100,13 @@ To ensure the CUDA kernels' outputs match those from C++ functions, use the `che
 
 
 
-# Subtask3 : LeNet-5 CNN Implementation
+# Subtask 3/4: LeNet-5 CNN Implementation/ CUDA Stream Optimization
 
-This section of our library leverages the power of NVIDIA CUDA to perform high-speed image processing and digit recognition on the MNIST dataset. Following the LeNet-5 architecture, it incorporates convolutional layers, activation functions (ReLU, Tanh), pooling layers (Max and Average), and a fully connected layer, concluding with a softmax probability distribution for digit classification.
+This section of our library harnesses the power of NVIDIA CUDA for rapid image processing and digit recognition on the MNIST dataset, employing the LeNet-5 architecture. It features convolutional layers, activation functions (ReLU, Tanh), pooling layers (Max and Average), and fully connected layers, culminating in a softmax probability distribution for accurate digit classification.
+
+The implementation optimizes the MNIST digit recognition process using CUDA streams, enhancing throughput and efficiency significantly. CUDA streams facilitate the concurrent execution of kernel launches and memory transfers, enabling our library to process images at high speed without compromising accuracy or performance.
+
+By adopting CUDA streams, we streamline the workflow, allowing for simultaneous operations that leverage GPU resources more effectively. This optimization ensures faster processing times for the entire MNIST dataset, showcasing the potential of parallel computing in deep learning tasks.
 
 ## Running the Digit Recognition Process
 
@@ -111,11 +115,13 @@ Before executing the recognition process, ensure your environment is set up with
 1. **Compilation**: To compile the program, navigate to the source directory and use the `nvcc` compiler:
     ```bash
     nvcc -std=c++11 -o s3 assignment2_subtask3.cu
+    nvcc -std=c++11 -o s4 assignment2_subtask4.cu
     ```
 
 2. **Execution**: Run the compiled executable with the following command:
     ```bash
     ./s3
+    ./s4
     ```
     The program automatically processes the MNIST images located in the predefined directory and outputs the recognition results.
 
