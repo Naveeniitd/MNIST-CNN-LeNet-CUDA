@@ -28,11 +28,6 @@ python batch_preprocess.py
 python preprocess.py
 ```
 
-
-Here's a README template tailored for the provided C++ code, which implements various image processing functions suitable for handling MNIST digit recognition tasks:
-
----
-
 # Subtask 1: Running C++ Functions
 
 This C++ library provides a set of functions for preprocessing and analyzing MNIST digit images. It includes convolution operations (with and without padding), non-linear activation functions (ReLU, tanh), subsampling (max pooling, average pooling), and transformation of float vectors to probability vectors using softmax and sigmoid functions. The library is designed to support flexible command-line arguments for easy integration into broader machine learning or image processing pipelines.
