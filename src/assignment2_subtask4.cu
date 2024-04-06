@@ -495,7 +495,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
 
 //------------------------------------MAIN FUNCTION-------------------------------------------------//
 int main() {
-    int correct_output = 0;
+    //int correct_output = 0;
     const int num_streams = 16;
     std::vector<cudaStream_t> streams(num_streams);
      
@@ -530,7 +530,7 @@ int main() {
     struct dirent* ent;
     cudaEvent_t start, stop;
     int count = 0;
-    int out_channel = 20;
+    //int out_channel = 20;
     CHECK_CUDA_ERROR(cudaEventCreate(&start));
     CHECK_CUDA_ERROR(cudaEventCreate(&stop));
     CHECK_CUDA_ERROR(cudaEventRecord(start));
@@ -545,7 +545,7 @@ int main() {
             std::string filename = ent->d_name;
             if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
                 std::string filepath = directory + filename;
-                cout << filepath  << endl;
+                //cout << filepath  << endl;
                 string labelpath = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/labels_batch_binary/" + filename.substr(0, 7) + "_labels.txt";
                 filepaths.push_back(filepath);
                 //cout << filepath  << endl;        
@@ -577,9 +577,9 @@ int main() {
         CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice));
 
 
-        cout << filepaths[i] << endl;
+        //cout << filepaths[i] << endl;
         std::string savePath = saveDirectory + filepaths[i].substr(filepaths[i].length() - 12, 8) + "_top5" + fileExtension;
-        cout  <<  savePath << endl;
+        //cout  <<  savePath << endl;
         std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
         if (!outFile.is_open()) {
             std::cerr << "Failed to open the file for writing." << std::endl;
