@@ -28,3 +28,60 @@ python batch_preprocess.py
 ```bash
 python preprocess.py
 ```
+
+
+Here's a README template tailored for the provided C++ code, which implements various image processing functions suitable for handling MNIST digit recognition tasks:
+
+---
+
+# Subtask 1: Running C++ Functions
+
+This C++ library provides a set of functions for preprocessing and analyzing MNIST digit images. It includes convolution operations (with and without padding), non-linear activation functions (ReLU, tanh), subsampling (max pooling, average pooling), and transformation of float vectors to probability vectors using softmax and sigmoid functions. The library is designed to support flexible command-line arguments for easy integration into broader machine learning or image processing pipelines.
+
+## Getting Started
+
+### Prerequisites
+
+Ensure you have access to an HPC cluster with CUDA support. Load any necessary modules, such as CUDA and a compatible compiler, if required by your HPC environment.
+
+### Compilation
+
+To compile the code, navigate to the project directory and use the following command:
+
+```bash
+module load compiler/cuda/10.2/compilervars
+nvcc -std=c++11 assignment2_subtask1.cu -o s1
+```
+
+This command compiles the source code into an executable named `s1`.
+
+## Usage
+
+The `s1` executable supports various command-line arguments to specify the operation to perform and its parameters. Here's how to use it:
+
+```bash
+./mnist_processor [path_to_bin_file] [Image Size] [in_channel] [Function] [additional parameters]
+```
+
+- `[path_to_bin_file]`: Path to the binary file containing the image data.
+- `[Image Size]`: Size of the image (e.g., 28 for MNIST).
+- `[in_channel]`: Number of input channels (e.g., 1 for grayscale images).
+- `[Function]`: The function to apply. Options include `MaxPooling`, `AvgPooling`, `Softmax`, `Sigmoid`, `relu`, and `tanh`.
+- `[additional parameters]`: Depends on the function chosen. For pooling operations, specify `[ksize] [stride]`.
+
+### Examples
+
+#### Max Pooling
+
+```bash
+./mnist_processor ./data/sample.bin 28 1 MaxPooling 2 2
+```
+
+This command applies max pooling to the image in `sample.bin` with a kernel size of 2 and a stride of 2.
+
+## Functions Implemented
+
+- **Convolution**: Applies a convolution operation between an input matrix and a kernel.
+- **ReLU and Tanh**: Applies the ReLU or tanh activation function to an input matrix.
+- **Max Pooling and Average Pooling**: Subsamples an input matrix using the max or average pooling method.
+- **Softmax and Sigmoid**: Converts a vector of floats to a vector of probabilities using the softmax or sigmoid function.
