@@ -1,5 +1,0 @@
-Class 7 Probability: 0.999534
-Class 2 Probability: 0.00027214
-Class 3 Probability: 0.000109741
-Class 9 Probability: 5.28444e-05
-Class 1 Probability: 1.79075e-05

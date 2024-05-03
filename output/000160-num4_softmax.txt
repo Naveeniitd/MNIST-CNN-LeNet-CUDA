@@ -1,0 +1,5 @@
+0.9999 class 4
+4.95818e-05 class 1
+2.70498e-05 class 8
+1.944e-05 class 6
+3.36415e-06 class 9

@@ -11,6 +11,7 @@
 #include <queue>
 #include <dirent.h>
 using namespace std;
+
 #define CHECK_CUDA_ERROR(err) do { \
     if (err != cudaSuccess) { \
         std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
@@ -23,6 +24,12 @@ using namespace std;
 #define f2_width 5010
 // __constant__ float d_conv1[c1_width];
 // __constant__ float d_fc2[f2_width];
+struct Record {
+    uint32_t filenameLength;
+    string filename;
+};
+vector<string> filenames_list;
+
 struct Weights {
     //float conv1[520];
     float* conv2;
@@ -356,30 +363,55 @@ bool imgload(const string& path, float* input){
 }
 //-------------------Function to load batch binary img in float* input-----------------------------------//
 bool loadImagesFromBin(const std::string& filePath, float* imageArray, int numImages, int imageSize) {
-    // Calculate the total size of the data to be read
-    size_t totalSize = numImages * imageSize * imageSize * sizeof(float);
-    
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filePath << std::endl;
         return false;
     }
 
-    // Read the data directly into the provided memory space
-    file.read(reinterpret_cast<char*>(imageArray), totalSize);
+    for (int i = 0; i < numImages; ++i) {
+        uint32_t filenameLength;
+        file.read(reinterpret_cast<char*>(&filenameLength), sizeof(filenameLength));
+        if (file.fail()) {
+            std::cerr << "Failed to read filename length." << std::endl;
+            file.close();
+            return false;
+        }
 
-    // Check if the read was successful
-    if (file.fail()) {
-        std::cerr << "Failed to read the expected amount of data." << std::endl;
-        file.close();
-        return false;
+        std::string filename(filenameLength, '\0');
+        file.read(&filename[0], filenameLength);
+        if (file.fail()) {
+            std::cerr << "Failed to read filename." << std::endl;
+            file.close();
+            return false;
+        }
+
+        // Remove .png extension
+        size_t pos = filename.find(".png");
+        if (pos != std::string::npos) {
+            filename.erase(pos, 4); // Remove the ".png" part
+        }
+
+        // Optionally print the modified filename
+        //std::cout << "Processing file: " << filename << std::endl;
+
+        // Store the filename globally
+        filenames_list.push_back(filename);
+        
+        // Read the image data directly into the provided memory space
+        file.read(reinterpret_cast<char*>(imageArray + i * imageSize * imageSize), imageSize * imageSize * sizeof(float));
+        if (file.fail()) {
+            std::cerr << "Failed to read image data for " << filename << "." << std::endl;
+            file.close();
+            return false;
+        }
     }
 
     file.close();
     return true;
 }
 //---------------------------------------IMAGE PROCESSING CODE----------------------------------------------------------//
-void image_processing_batch(float* c1_input, float* c1_output, float* p1_output, float* c2_output, float* p2_output, float* f1_output, float* f2_output, float* d_conv1, float* d_conv2, float* d_fc1, float* d_fc2, int batch_size, int isize, ofstream& outFile,vector<cudaStream_t> &streams, int stream_idx){
+void image_processing_batch(float* c1_input, float* c1_output, float* p1_output, float* c2_output, float* p2_output, float* f1_output, float* f2_output, float* d_conv1, float* d_conv2, float* d_fc1, float* d_fc2, int batch_size, int isize /*ofstream& outFile*/,vector<cudaStream_t> &streams, int stream_idx, int i){
     //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//                      
     //---------------------------------------------------------------------------------------------------------------------//
     for (int imgIdx = 0; imgIdx < batch_size; ++imgIdx) {
@@ -482,14 +514,31 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         findTop5(test6, 10, top_classes, top_probs);
         //cout << count << endl;
         
-        outFile << "Image " << imgIdx + 1 << ":" << endl;
-        for (size_t i = 0; i < top_classes.size(); ++i) {
-            outFile << "Class " << top_classes[i] << ", Probability: " << top_probs[i] << endl;
+        // outFile << "Image " << imgIdx + 1 << ":" << endl;
+        // for (size_t i = 0; i < top_classes.size(); ++i) {
+        //     outFile << "Class " << top_classes[i] << ", Probability: " << top_probs[i] << endl;
+        // }
+        // outFile << endl; // Add a newline for separation between images
+
+        std::string outputFilename = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/" + filenames_list[imgIdx+(i*100)] + "_softmax.txt";
+        //cout << outputFilename << endl;
+        std::ofstream outFile(outputFilename);
+
+        if (!outFile.is_open()) {
+            std::cerr << "Failed to open the file for writing: " << outputFilename << std::endl;
+            continue; // Skip this iteration if the file couldn't be opened
         }
-        outFile << endl; // Add a newline for separation between images
+
+        // Write the top 5 classes and probabilities
+       // outFile << "Top 5 Probabilities for " << globalFilenames[imgIdx] << ":\n";
+        for (size_t i = 0; i < top_classes.size(); ++i) {
+            //outFile << "Class " << top_classes[i] << ", Probability: " << top_probs[i] << std::endl;
+            outFile << top_probs[i] << " class " << top_classes[i] << std::endl;
+        }
+        outFile.close();
             // //-----------------------------------Delete Memeory-----------------------------------------------------//   
     }
-    outFile.close();                         
+    //outFile.close();                         
 }
   
 
@@ -505,7 +554,7 @@ int main() {
     std::vector<std::string> filepaths;
     const int batch_size = 100;
     const int isize = 28 * 28;
-    string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/stream_output_batch/";
+    string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/";
     string fileExtension = ".txt";
     //-----------------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
@@ -525,7 +574,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice));
              
     
-    std::string directory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/batch_binary/";
+    std::string directory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/";
     DIR* dir;
     struct dirent* ent;
     cudaEvent_t start, stop;
@@ -577,22 +626,22 @@ int main() {
         CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice));
 
 
-        //cout << filepaths[i] << endl;
-        std::string savePath = saveDirectory + filepaths[i].substr(filepaths[i].length() - 12, 8) + "_top5" + fileExtension;
-        //cout  <<  savePath << endl;
-        std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
-        if (!outFile.is_open()) {
-            std::cerr << "Failed to open the file for writing." << std::endl;
-            return -1; // Handle error appropriately
-        }
+        // //cout << filepaths[i] << endl;
+        // std::string savePath = saveDirectory + filepaths[i].substr(filepaths[i].length() - 12, 8) + "_top5" + fileExtension;
+        // //cout  <<  savePath << endl;
+        // std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
+        // if (!outFile.is_open()) {
+        //     std::cerr << "Failed to open the file for writing." << std::endl;
+        //     return -1; // Handle error appropriately
+        // }
 
 
 
-        image_processing_batch(c1_input, c1_output, p1_output, c2_output, p2_output, f1_output, f2_output, d_conv1, d_conv2, d_fc1, d_fc2, batch_size, isize, outFile, streams, stream_idx);
+        image_processing_batch(c1_input, c1_output, p1_output, c2_output, p2_output, f1_output, f2_output, d_conv1, d_conv2, d_fc1, d_fc2, batch_size, isize, streams, stream_idx, i);
         stream_idx = (stream_idx + 1) % num_streams;
         //cout<< stream_idx << endl;
 
-        outFile.close();  
+        //outFile.close();  
         CHECK_CUDA_ERROR(cudaFree(c1_output));
         CHECK_CUDA_ERROR(cudaFree(c2_output));
         CHECK_CUDA_ERROR(cudaFree(p1_output));

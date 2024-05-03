@@ -1,0 +1,5 @@
+1 class 8
+4.52471e-07 class 2
+3.18274e-08 class 5
+2.11527e-09 class 9
+3.14958e-10 class 6
