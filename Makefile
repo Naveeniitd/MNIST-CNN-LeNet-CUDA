@@ -21,4 +21,4 @@ $(BINDIR)/%: $(SRCDIR)/assignment2_%.cu
 	$(NVCC) $< -o $@
 
 clean:
-	rm -f $(addprefix $(BINDIR)/,$(TARGETS)) ActualDigit.txt
+	rm -f $(addprefix $(BINDIR)/,$(TARGETS))
