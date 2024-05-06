@@ -41,6 +41,6 @@ for batch_idx in range(total_batches):
             
             # Write the image data
             data_format = f'{img_flat.size}f'
-            f.write(struct.pack(data_format, *img_fla)
+            f.write(struct.pack(data_format, *img_flat))
 
     

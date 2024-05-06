@@ -546,7 +546,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
 //------------------------------------MAIN FUNCTION-------------------------------------------------//
 int main() {
     //int correct_output = 0;
-    const int num_streams = 8;
+    const int num_streams = 16;
     cudaStream_t streams[num_streams];
      
     for (int i = 0; i < num_streams; ++i) {
@@ -610,7 +610,7 @@ int main() {
         return EXIT_FAILURE;
     } 
     float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *c1_input;
-    CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*batch_size * sizeof(float)));  
+    CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*100 * sizeof(float)));  
     CHECK_CUDA_ERROR(cudaMalloc(&c1_output, 24*24*20*100*sizeof(float)));
     CHECK_CUDA_ERROR(cudaMalloc(&p1_output, 12*12*20*100*sizeof(float)));
     CHECK_CUDA_ERROR(cudaMalloc(&c2_output, 8*8*50*100*sizeof(float)));
@@ -620,7 +620,7 @@ int main() {
     int stream_idx = 0; // Index of the current stream to use
     for (int i = 0 ; i < 100 ; i++) {
         stream_idx = i % num_streams;
-        cout << stream_idx << "stream idx is working " << endl;
+        //cout << stream_idx << " stream idx is working " << endl;
         
 
         float* input = new float[28*28*100];
@@ -663,7 +663,7 @@ int main() {
         cudaStreamDestroy(streams[i]);
     }
 
-    cout << count << endl;
+    //cout << count << endl;
     delete[] weights.conv2;
     delete[] weights.fc1;
     CHECK_CUDA_ERROR(cudaFree(d_conv1));
@@ -674,7 +674,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaEventSynchronize(stop));
     float milliseconds = 0;
     CHECK_CUDA_ERROR(cudaEventElapsedTime(&milliseconds, start, stop));
-    printf("Time taken: %f ms\n", milliseconds);
+    //printf("Time taken: %f ms\n", milliseconds);
     CHECK_CUDA_ERROR(cudaEventDestroy(start));
     CHECK_CUDA_ERROR(cudaEventDestroy(stop));
     return 0;
