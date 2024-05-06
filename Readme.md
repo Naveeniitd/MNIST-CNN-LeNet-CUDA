@@ -1,5 +1,5 @@
 
-# Project Title
+# Image processing library to recognize MNIST digits
 
 ## Directory Structure
 
