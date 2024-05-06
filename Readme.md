@@ -1,5 +1,4 @@
 
-```markdown
 # Project Title
 
 ## Directory Structure
@@ -27,6 +26,7 @@
     ├── conv2.txt
     ├── fc1.txt
     └── fc2.txt
+
 ```
 
 ## Usage Instructions
@@ -81,6 +81,4 @@ Outputs are saved in the `output` directory in the same format as specified in t
 ## Additional Information
 Refer to `Report.pdf` for detailed information on the implementation and evaluation of the project.
 
-
-```
 
