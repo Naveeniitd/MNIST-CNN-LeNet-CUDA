@@ -521,8 +521,9 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
   
 
 //------------------------------------MAIN FUNCTION-------------------------------------------------//
-int main() {
+int main(int argc, char* argv[]) {
     //int correct_output = 0;
+    
     const int num_streams = 16;
     std::vector<cudaStream_t> streams(num_streams);
      
@@ -557,6 +558,7 @@ int main() {
     struct dirent* ent;
     cudaEvent_t start, stop;
     int count = 0;
+    int ar = stoi(argv[1]);
     //int out_channel = 20;
     CHECK_CUDA_ERROR(cudaEventCreate(&start));
     CHECK_CUDA_ERROR(cudaEventCreate(&stop));
@@ -616,7 +618,13 @@ int main() {
 
 
         image_processing_batch(c1_input, c1_output, p1_output, c2_output, p2_output, f1_output, f2_output, d_conv1, d_conv2, d_fc1, d_fc2, batch_size, isize, streams, stream_idx, i);
-        stream_idx = (stream_idx + 1) % num_streams;
+        if(ar==0){
+            stream_idx = 0;
+        }
+        else if (ar==1){
+            stream_idx = (stream_idx + 1) % num_streams;
+        }
+        
         //cout<< stream_idx << endl;
 
         //outFile.close();  
@@ -644,7 +652,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaEventSynchronize(stop));
     float milliseconds = 0;
     CHECK_CUDA_ERROR(cudaEventElapsedTime(&milliseconds, start, stop));
-    //printf("Time taken: %f ms\n", milliseconds);
+    printf("Time taken: %f ms\n", milliseconds);
     CHECK_CUDA_ERROR(cudaEventDestroy(start));
     CHECK_CUDA_ERROR(cudaEventDestroy(stop));
     return 0;
