@@ -22,3 +22,5 @@ $(BINDIR)/%: $(SRCDIR)/assignment2_%.cu
 
 clean:
 	rm -f $(addprefix $(BINDIR)/,$(TARGETS))
+	rm -f output/*.txt
+	rm -f pre-proc-img/*.bin

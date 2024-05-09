@@ -31,14 +31,6 @@ struct Weights {
     float* conv1;
     float* fc2;    
 };
-void printstring(vector<string> filenames_list){
-    int help = 0;
-    for (const std::string& filename : filenames_list) {
-        std::cout << filename << std::endl;
-        help++;
-    }
-    //cout << help << endl;
-}
 void printArray(float* array, int n) {
     std::cout << "[";
     for (int i = 0; i < n; ++i) {
@@ -256,16 +248,9 @@ bool loadImagesFromBin(const std::string& filePath, float* imageArray, int numIm
         // Remove .png extension
         size_t pos = filename.find(".png");
         if (pos != std::string::npos) {
-            filename.erase(pos, 4); // Remove the ".png" part
+            filename.erase(pos, 4);
         }
-
-        // Optionally print the modified filename
-        //std::cout << "Processing file: " << filename << std::endl;
-
-        // Store the filename globally
         filenames_list.push_back(filename);
-        
-        // Read the image data directly into the provided memory space
         file.read(reinterpret_cast<char*>(imageArray + i * imageSize * imageSize), imageSize * imageSize * sizeof(float));
         if (file.fail()) {
             std::cerr << "Failed to read image data for " << filename << "." << std::endl;
@@ -387,7 +372,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         // }
         // outFile << endl; // Add a newline for separation between images
 
-        std::string outputFilename = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/" + filenames_list[imgIdx+(i*100)] + "_softmax.txt";
+        std::string outputFilename = "output/" + filenames_list[imgIdx+(i*100)] + "_softmax.txt";
         //cout << outputFilename << endl;
         std::ofstream outFile(outputFilename);
 
@@ -413,14 +398,14 @@ int main() {
     std::vector<std::string> filepaths;
     const int batch_size = 100;
     const int isize = 28 * 28;
-    string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/";
+    string saveDirectory = "output/";
     string fileExtension = ".txt";
     //-----------------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
-    weights.conv1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 520);
-    weights.conv2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv2.txt", 25050);
-    weights.fc1 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc1.txt", 400500);
-    weights.fc2 = fileRead("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc2.txt", 5010);
+    weights.conv1 = fileRead("weights/conv1.txt", 520);
+    weights.conv2 = fileRead("weights/conv2.txt", 25050);
+    weights.fc1 = fileRead("weights/fc1.txt", 400500);
+    weights.fc2 = fileRead("weights/fc2.txt", 5010);
     //printArray(weights.conv1, 520);
     float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
@@ -433,23 +418,17 @@ int main() {
     CHECK_CUDA_ERROR(cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice));
              
     
-    std::string directory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/";
+    std::string directory = "pre-proc-img/";
     DIR* dir;
     struct dirent* ent;
     cudaEvent_t start, stop;
-    int count = 0;
-    //int out_channel = 20;
     CHECK_CUDA_ERROR(cudaEventCreate(&start));
     CHECK_CUDA_ERROR(cudaEventCreate(&stop));
     CHECK_CUDA_ERROR(cudaEventRecord(start));
-
-     
     
     if ((dir = opendir(directory.c_str())) != nullptr) {    
    
         while ((ent = readdir(dir)) != nullptr) {
-            count++;
-            
             std::string filename = ent->d_name;
             if (filename.length() > 4 && filename.substr(filename.length() - 4) == ".bin") {
                 std::string filepath = directory + filename;

@@ -11,7 +11,6 @@
 #include <queue>
 #include <dirent.h>
 using namespace std;
-
 #define CHECK_CUDA_ERROR(err) do { \
     if (err != cudaSuccess) { \
         std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
@@ -29,7 +28,6 @@ struct Record {
     string filename;
 };
 vector<string> filenames_list;
-
 struct Weights {
     //float conv1[520];
     float* conv2;
@@ -377,7 +375,6 @@ bool loadImagesFromBin(const std::string& filePath, float* imageArray, int numIm
             file.close();
             return false;
         }
-
         std::string filename(filenameLength, '\0');
         file.read(&filename[0], filenameLength);
         if (file.fail()) {
@@ -385,20 +382,12 @@ bool loadImagesFromBin(const std::string& filePath, float* imageArray, int numIm
             file.close();
             return false;
         }
-
         // Remove .png extension
         size_t pos = filename.find(".png");
         if (pos != std::string::npos) {
-            filename.erase(pos, 4); // Remove the ".png" part
+            filename.erase(pos, 4);
         }
-
-        // Optionally print the modified filename
-        //std::cout << "Processing file: " << filename << std::endl;
-
-        // Store the filename globally
         filenames_list.push_back(filename);
-        
-        // Read the image data directly into the provided memory space
         file.read(reinterpret_cast<char*>(imageArray + i * imageSize * imageSize), imageSize * imageSize * sizeof(float));
         if (file.fail()) {
             std::cerr << "Failed to read image data for " << filename << "." << std::endl;
@@ -411,7 +400,7 @@ bool loadImagesFromBin(const std::string& filePath, float* imageArray, int numIm
     return true;
 }
 //---------------------------------------IMAGE PROCESSING CODE----------------------------------------------------------//
-void image_processing_batch(float* c1_input, float* c1_output, float* p1_output, float* c2_output, float* p2_output, float* f1_output, float* f2_output, float* d_conv1, float* d_conv2, float* d_fc1, float* d_fc2, int batch_size, int isize, cudaStream_t stream,  int i){
+void image_processing_batch(float* c1_input, float* c1_output, float* p1_output, float* c2_output, float* p2_output, float* f1_output, float* f2_output, float* d_conv1, float* d_conv2, float* d_fc1, float* d_fc2, int batch_size, int isize,vector<cudaStream_t> &streams, int stream_idx, int i){
     //---------LENET architecure with Layer,Input_dim,output_dim,Input_Channels,Output_Channels,Kernel,Stride,Padding,Has Relu ?,No of Weights,Bias,Total Weights-------------------------------------------//                      
     //---------------------------------------------------------------------------------------------------------------------//
     for (int imgIdx = 0; imgIdx < batch_size; ++imgIdx) {
@@ -432,7 +421,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         dim3 c1_grid((24 + c1_block.x - 1) / c1_block.x,
                 (24 + c1_block.y - 1) / c1_block.y,
                 out_channel);
-        conv_cuda<<<c1_grid, c1_block, 0, stream>>>(curr_c1_input, d_conv1, curr_c1_output, 1, 20, 28, 5);
+        conv_cuda<<<c1_grid, c1_block, 0, streams[stream_idx]>>>(curr_c1_input, d_conv1, curr_c1_output, 1, 20, 28, 5);
             // Wait for the kernel to complete
         cudaError_t error = cudaGetLastError();
         if (error != cudaSuccess) {
@@ -444,7 +433,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         dim3 p1_grid((12 + p1_block.x - 1) / p1_block.x,
                 (12 + p1_block.y - 1) / p1_block.y,
                 out_channel);
-        MaxPooling<<<p1_grid, p1_block, 0, stream>>>(curr_c1_output, curr_p1_output, 20, 24, 2, 2);      
+        MaxPooling<<<p1_grid, p1_block, 0, streams[stream_idx]>>>(curr_c1_output, curr_p1_output, 20, 24, 2, 2);      
         cudaError_t error1 = cudaGetLastError();
         if (error1 != cudaSuccess) {
             std::cerr << "Error during Max_pool_1 execution: " << cudaGetErrorString(error1) << std::endl;
@@ -457,7 +446,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
                 (8 + c2_block.y - 1) / c2_block.y,
                 out_channel); // 50 channels to process && batch_size/cuda_stream imgs
 
-        conv_cuda<<<c2_grid, c2_block, 0, stream>>>(curr_p1_output, d_conv2, curr_c2_output, 20, 50, 12, 5);
+        conv_cuda<<<c2_grid, c2_block, 0, streams[stream_idx]>>>(curr_p1_output, d_conv2, curr_c2_output, 20, 50, 12, 5);
         
         cudaError_t error2 = cudaGetLastError();
         if (error2 != cudaSuccess) {
@@ -469,7 +458,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
             
         dim3 p2_block(4, 4);
         dim3 p2_grid(1, 1, out_channel);
-        MaxPooling<<<p2_grid, p2_block, 0,stream>>>(curr_c2_output, curr_p2_output, 50, 8, 2, 2);
+        MaxPooling<<<p2_grid, p2_block, 0,streams[stream_idx]>>>(curr_c2_output, curr_p2_output, 50, 8, 2, 2);
         
         cudaError_t error3 = cudaGetLastError();
         if (error3 != cudaSuccess) {
@@ -482,7 +471,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         int f1_grid = (500 + f1_block - 1) / f1_block;
         dim3 threads1(f1_block);
         dim3 blocks1(f1_grid);
-        fconv_cudaR<<<blocks1, threads1, 0, stream>>>(curr_p2_output, d_fc1, curr_f1_output, 50, 500, 4);
+        fconv_cudaR<<<blocks1, threads1, 0, streams[stream_idx]>>>(curr_p2_output, d_fc1, curr_f1_output, 50, 500, 4);
         cudaError_t error4 = cudaGetLastError();
         if (error4 != cudaSuccess) {
             std::cerr << "Error during fully_conv_cuda_1 execution: " << cudaGetErrorString(error4) << std::endl;
@@ -494,7 +483,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         
         dim3 threads(256);
         dim3 blocks((10 + f1_block - 1) / f1_block);
-        fconv_cuda<<<blocks, threads, 0, stream>>>(curr_f1_output, d_fc2, curr_f2_output, 500, 10, 1);
+        fconv_cuda<<<blocks, threads, 0, streams[stream_idx]>>>(curr_f1_output, d_fc2, curr_f2_output, 500, 10, 1);
         cudaError_t error5 = cudaGetLastError();
         if (error5 != cudaSuccess) {
             std::cerr << "Error during fully_conv_cuda_2 execution: " << cudaGetErrorString(error5) << std::endl;
@@ -504,8 +493,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         // //------------------------------------SOFTMAX----------------------------------------------------//
 
         float* test6 = new float[10];
-        CHECK_CUDA_ERROR(cudaMemcpyAsync(test6, curr_f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost, stream));
-        cudaStreamSynchronize(stream);
+        CHECK_CUDA_ERROR(cudaMemcpy(test6, curr_f2_output, 10 * sizeof(float), cudaMemcpyDeviceToHost));
         //printArray(test6, 10 );
         softmax(test6, 10);
         //printArray(test6,10 );
@@ -515,31 +503,20 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
         findTop5(test6, 10, top_classes, top_probs);
         //cout << count << endl;
         
-        // outFile << "Image " << imgIdx + 1 << ":" << endl;
-        // for (size_t i = 0; i < top_classes.size(); ++i) {
-        //     outFile << "Class " << top_classes[i] << ", Probability: " << top_probs[i] << endl;
-        // }
-        // outFile << endl; // Add a newline for separation between images
-
-        std::string outputFilename = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/" + filenames_list[imgIdx+(i*100)] + "_softmax.txt";
+        std::string outputFilename = "output/" + filenames_list[imgIdx+(i*100)] + "_softmax.txt";
         //cout << outputFilename << endl;
         std::ofstream outFile(outputFilename);
 
         if (!outFile.is_open()) {
             std::cerr << "Failed to open the file for writing: " << outputFilename << std::endl;
-            continue; // Skip this iteration if the file couldn't be opened
+            continue;
         }
-
-        // Write the top 5 classes and probabilities
-       // outFile << "Top 5 Probabilities for " << globalFilenames[imgIdx] << ":\n";
         for (size_t i = 0; i < top_classes.size(); ++i) {
-            //outFile << "Class " << top_classes[i] << ", Probability: " << top_probs[i] << std::endl;
             outFile << top_probs[i] << " class " << top_classes[i] << std::endl;
         }
         outFile.close();
             // //-----------------------------------Delete Memeory-----------------------------------------------------//   
-    }
-    //outFile.close();                         
+    }                        
 }
   
 
@@ -547,7 +524,7 @@ void image_processing_batch(float* c1_input, float* c1_output, float* p1_output,
 int main() {
     //int correct_output = 0;
     const int num_streams = 16;
-    cudaStream_t streams[num_streams];
+    std::vector<cudaStream_t> streams(num_streams);
      
     for (int i = 0; i < num_streams; ++i) {
         cudaStreamCreate(&streams[i]);
@@ -555,14 +532,14 @@ int main() {
     std::vector<std::string> filepaths;
     const int batch_size = 100;
     const int isize = 28 * 28;
-    string saveDirectory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/output/";
+    string saveDirectory = "output/";
     string fileExtension = ".txt";
     //-----------------------Reading Trained Weights in Weights struct datatype ----------------------//
     Weights weights;
-    weights.conv1 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv1.txt", 520);
-    weights.conv2 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/conv2.txt", 25050);
-    weights.fc1 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc1.txt", 400500);
-    weights.fc2 = fileReadP("/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/weights/fc2.txt", 5010);
+    weights.conv1 = fileReadP("weights/conv1.txt", 520);
+    weights.conv2 = fileReadP("weights/conv2.txt", 25050);
+    weights.fc1 = fileReadP("weights/fc1.txt", 400500);
+    weights.fc2 = fileReadP("weights/fc2.txt", 5010);
     //printArray(weights.conv1, 520);
     float *d_conv1, *d_fc2, *d_conv2, *d_fc1; //variable for Device holding pointer to the data of conv1.txt, conv2.txt fc1.txt and fc2.txt respectively
     CHECK_CUDA_ERROR(cudaMalloc(&d_conv1, 520 * sizeof(float)));
@@ -575,7 +552,7 @@ int main() {
     CHECK_CUDA_ERROR(cudaMemcpy(d_fc2, weights.fc2, 5010 * sizeof(float), cudaMemcpyHostToDevice));
              
     
-    std::string directory = "/home/cse/btech/cs1190378/MNIST-CNN-LeNet-CUDA/pre-proc-img/";
+    std::string directory = "pre-proc-img/";
     DIR* dir;
     struct dirent* ent;
     cudaEvent_t start, stop;
@@ -608,29 +585,26 @@ int main() {
         // Could not open directory
         std::cerr << "Could not open directory" << std::endl;
         return EXIT_FAILURE;
-    } 
-    float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *c1_input;
-    CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*100 * sizeof(float)));  
-    CHECK_CUDA_ERROR(cudaMalloc(&c1_output, 24*24*20*100*sizeof(float)));
-    CHECK_CUDA_ERROR(cudaMalloc(&p1_output, 12*12*20*100*sizeof(float)));
-    CHECK_CUDA_ERROR(cudaMalloc(&c2_output, 8*8*50*100*sizeof(float)));
-    CHECK_CUDA_ERROR(cudaMalloc(&p2_output, 4*4*50*100*sizeof(float)));
-    CHECK_CUDA_ERROR(cudaMalloc(&f1_output, 500*100*sizeof(float)));
-    CHECK_CUDA_ERROR(cudaMalloc(&f2_output, 10 * 100*sizeof(float)));    
+    }     
     int stream_idx = 0; // Index of the current stream to use
     for (int i = 0 ; i < 100 ; i++) {
-        stream_idx = i % num_streams;
-        //cout << stream_idx << " stream idx is working " << endl;
-        
+        float *c1_output, *p1_output, *c2_output, *p2_output, *f1_output, *f2_output, *c1_input;
+        CHECK_CUDA_ERROR(cudaMalloc(&c1_input, 28*28*batch_size * sizeof(float)));  
+        CHECK_CUDA_ERROR(cudaMalloc(&c1_output, 24*24*20*100*sizeof(float)));
+        CHECK_CUDA_ERROR(cudaMalloc(&p1_output, 12*12*20*100*sizeof(float)));
+        CHECK_CUDA_ERROR(cudaMalloc(&c2_output, 8*8*50*100*sizeof(float)));
+        CHECK_CUDA_ERROR(cudaMalloc(&p2_output, 4*4*50*100*sizeof(float)));
+        CHECK_CUDA_ERROR(cudaMalloc(&f1_output, 500*100*sizeof(float)));
+        CHECK_CUDA_ERROR(cudaMalloc(&f2_output, 10 * 100*sizeof(float)));
 
         float* input = new float[28*28*100];
         //cout << filepaths[i] << endl;
         loadImagesFromBin(filepaths[i], input, 100, 28);
         //printArray(input, 28*28);
-        CHECK_CUDA_ERROR(cudaMemcpyAsync(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice, streams[stream_idx]));
+        CHECK_CUDA_ERROR(cudaMemcpy(c1_input, input,28*28*100*sizeof(float), cudaMemcpyHostToDevice));
 
 
-        // //cout << filepaths[i] << endl;
+        //cout << filepaths[i] << endl;
         // std::string savePath = saveDirectory + filepaths[i].substr(filepaths[i].length() - 12, 8) + "_top5" + fileExtension;
         // //cout  <<  savePath << endl;
         // std::ofstream outFile(savePath, std::ios::out); // Open in write mode, overwrites existing file
@@ -641,29 +615,25 @@ int main() {
 
 
 
-        image_processing_batch(c1_input, c1_output, p1_output, c2_output, p2_output, f1_output, f2_output, d_conv1, d_conv2, d_fc1, d_fc2, batch_size, isize, streams[stream_idx], i);
-        
+        image_processing_batch(c1_input, c1_output, p1_output, c2_output, p2_output, f1_output, f2_output, d_conv1, d_conv2, d_fc1, d_fc2, batch_size, isize, streams, stream_idx, i);
+        stream_idx = (stream_idx + 1) % num_streams;
         //cout<< stream_idx << endl;
 
         //outFile.close();  
-        
+        CHECK_CUDA_ERROR(cudaFree(c1_output));
+        CHECK_CUDA_ERROR(cudaFree(c2_output));
+        CHECK_CUDA_ERROR(cudaFree(p1_output));
+        CHECK_CUDA_ERROR(cudaFree(p2_output));    
+        CHECK_CUDA_ERROR(cudaFree(f1_output));
+        CHECK_CUDA_ERROR(cudaFree(f2_output));
 
-    }
-    CHECK_CUDA_ERROR(cudaFree(c1_output));
-    CHECK_CUDA_ERROR(cudaFree(c2_output));
-    CHECK_CUDA_ERROR(cudaFree(p1_output));
-    CHECK_CUDA_ERROR(cudaFree(p2_output));    
-    CHECK_CUDA_ERROR(cudaFree(f1_output));
-    CHECK_CUDA_ERROR(cudaFree(f2_output));
-    for (int i = 0; i < num_streams; ++i) {
-    cudaStreamSynchronize(streams[i]);
     }
 
     for (int i = 0; i < num_streams; ++i) {
         cudaStreamDestroy(streams[i]);
     }
 
-    //cout << count << endl;
+   //cout << count << endl;
     delete[] weights.conv2;
     delete[] weights.fc1;
     CHECK_CUDA_ERROR(cudaFree(d_conv1));
